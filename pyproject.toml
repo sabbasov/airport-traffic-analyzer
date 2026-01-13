@@ -4,9 +4,8 @@ version = "0.1.0"
 requires-python = ">= 3.12.4"
 description = "A real-time dashboard for monitoring airport traffic and airline delays."
 dependencies = [
-    "shiny>=0.6.0",
     "pandas",
-    "plotly",
+    "json",
     "requests",
-    "shinywidgets"
+    "pathlib"
 ]
