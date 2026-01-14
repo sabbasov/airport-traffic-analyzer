@@ -64,7 +64,7 @@ countries_data = fetch_or_load("countries")
 # future_flight_schedules_data = fetch_or_load("future_flight_schedules") # not included in free plan
 cnt = 0
 for country in countries_data["data"]:
-    if country["currency_name"] == "Euro":
+    if country["currency_name"] == "Dollar":
         print(
             f"{country["currency_name"]}, {country["capital"]}, {country["country_name"]}"
         )
