@@ -5,7 +5,6 @@ requires-python = ">= 3.12.4"
 description = "A real-time dashboard for monitoring airport traffic and airline delays."
 dependencies = [
     "pandas",
-    "json",
     "requests",
-    "pathlib"
+    "scikit-learn"
 ]
