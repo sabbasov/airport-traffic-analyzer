@@ -3,8 +3,6 @@ Name: airport-traffic-analyzer
 Version: 0.1.0
 Summary: A real-time dashboard for monitoring airport traffic and airline delays.
 Requires-Python: >=3.12.4
-Requires-Dist: shiny>=0.6.0
 Requires-Dist: pandas
-Requires-Dist: plotly
 Requires-Dist: requests
-Requires-Dist: shinywidgets
+Requires-Dist: scikit-learn

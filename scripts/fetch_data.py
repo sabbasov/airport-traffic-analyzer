@@ -1,70 +1,129 @@
 import requests
 import json
+import time
 from pathlib import Path
+import pandas as pd
+import openmeteo_requests
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
+CLEANED_DIR = DATA_DIR / "cleaned"
 DATA_DIR.mkdir(exist_ok=True)
+CLEANED_DIR.mkdir(parents=True, exist_ok=True)
 
-API_KEY = "285122daf0a57d6e80a80ed9d132b1da"
-
-# Toggle whether to fetch from API or load from cache
-FETCH_FROM_API = False
-
-# Define all endpoints you care about
-ENDPOINTS = {
-    "flights": "flights",
-    "routes": "routes",
-    "airports": "airports",
-    "airlines": "airlines",
-    "airplanes": "airplanes",
-    "aircraft_types": "aircraft_types",
-    "aviation_taxes": "aviation_taxes",
-    "cities": "cities",
-    "countries": "countries",
-    "flight_schedules": "schedules",
-    "future_flight_schedules": "schedules/future"
-}
-
+API_KEY = "285122daf0a57d6e80a80ed9d132_REPLACE_WITH_YOURS" # Ensure this is your key
 BASE_URL = "https://api.aviationstack.com/v1"
 
-def fetch_or_load(endpoint_name):
-    """Fetch data from API or load from cached JSON file."""
+FETCH_FROM_API = False 
+
+ENDPOINTS = {
+    "flights": "flights",
+    "airports": "airports",
+    "airlines": "airlines",
+    "cities": "cities",
+    "countries": "countries",
+}
+
+def fetch_or_load(endpoint_name, paginate=False):
     endpoint_path = ENDPOINTS[endpoint_name]
     cache_file = DATA_DIR / f"{endpoint_name}.json"
 
     if FETCH_FROM_API:
-        print(f"Fetching {endpoint_name} from API...")
-        params = {"access_key": API_KEY}
-        response = requests.get(f"{BASE_URL}/{endpoint_path}", params=params)
-        response.raise_for_status()
-        data = response.json()
+        all_data = []
+        offset = 0
+        limit = 100
+        
+        while True:
+            params = {"access_key": API_KEY, "offset": offset, "limit": limit}
+            response = requests.get(f"{BASE_URL}/{endpoint_path}", params=params, timeout=(5, 15))
+            response.raise_for_status()
+            res_json = response.json()
+            
+            batch = res_json.get("data", [])
+            all_data.extend(batch)
+            
+            if not paginate:
+                break
+                
+            pagination = res_json.get("pagination", {})
+            total = pagination.get("total", 0)
+            print(f"  > Progress: {len(all_data)} / {total}")
+            
+            if len(all_data) >= total or not batch: break
+            
+            offset += limit
+            time.sleep(1)
 
-        # Save to cache
+        data = {"data": all_data}
         with open(cache_file, "w") as f:
             json.dump(data, f, indent=2)
-        print(f"Saved {endpoint_name} data to {cache_file}")
     else:
-        print(f"Loading {endpoint_name} from cache...")
         with open(cache_file) as f:
             data = json.load(f)
-
     return data
 
+airports_data = fetch_or_load("airports", paginate=True)
 flights_data = fetch_or_load("flights")
-airports_data = fetch_or_load("airports")
-airlines_data = fetch_or_load("airlines")
-# routes_data = fetch_or_load("routes") # not included in free plan
-airplanes_data = fetch_or_load("airplanes")
-aircraft_types_data = fetch_or_load("aircraft_types")
-# aviation_taxes_data = fetch_or_load("aviation_taxes") # not included in free plan
 cities_data = fetch_or_load("cities")
 countries_data = fetch_or_load("countries")
-# flight_schedules_data = fetch_or_load("flight_schedules") # not included in free plan
-# future_flight_schedules_data = fetch_or_load("future_flight_schedules") # not included in free plan
-cnt = 0
-for country in countries_data["data"]:
-    if country["currency_name"] == "Dollar":
-        print(
-            f"{country["currency_name"]}, {country["capital"]}, {country["country_name"]}"
+
+airports_df = pd.DataFrame(airports_data["data"])
+airports_df = airports_df.drop_duplicates(subset=["iata_code"])
+airports_df = airports_df.dropna(subset=["latitude", "longitude"])
+airports_df = airports_df[airports_df["latitude"] != 0]
+airports_lookup = airports_df.set_index("iata_code")[["latitude", "longitude"]]
+
+flights = pd.json_normalize(flights_data["data"], sep='_')
+
+flights["departure_estimated"] = pd.to_datetime(flights["departure_estimated"], utc=True)
+flights["flight_date_str"] = pd.to_datetime(flights["flight_date"]).dt.strftime('%Y-%m-%d')
+
+flights = flights.merge(airports_lookup, left_on="departure_iata", right_index=True, how="left")
+
+weather_tasks = flights.dropna(subset=["latitude", "longitude", "flight_date_str"])
+unique_locations = weather_tasks.drop_duplicates(subset=["departure_iata", "flight_date_str"])
+
+if not unique_locations.empty:
+    openmeteo = openmeteo_requests.Client()
+    url = "https://archive-api.open-meteo.com/v1/archive"
+
+    params = {
+        "latitude": unique_locations["latitude"].tolist(),
+        "longitude": unique_locations["longitude"].tolist(),
+        "start_date": unique_locations["flight_date_str"].min(),
+        "end_date": unique_locations["flight_date_str"].max(),
+        "hourly": ["wind_speed_10m"],
+        "timezone": "UTC"
+    }
+
+    responses = openmeteo.weather_api(url, params=params)
+
+    weather_list = []
+    for i, response in enumerate(responses):
+        hourly = response.Hourly()
+        times = pd.date_range(
+            start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
+            end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+            freq=pd.Timedelta(seconds=hourly.Interval()),
+            inclusive="left"
         )
+        weather_list.append(pd.DataFrame({
+            "weather_time": times,
+            "wind_speed_10m": hourly.Variables(0).ValuesAsNumpy(),
+            "departure_iata": unique_locations.iloc[i]["departure_iata"]
+        }))
+
+    weather_bank = pd.concat(weather_list).sort_values("weather_time")
+
+    flights = flights.sort_values("departure_estimated")
+    final_df = pd.merge_asof(
+        flights,
+        weather_bank,
+        left_on="departure_estimated",
+        right_on="weather_time",
+        by="departure_iata",
+        direction="nearest"
+    )
+
+    success_rate = final_df["wind_speed_10m"].notna().mean() * 100
+    final_df.to_csv(CLEANED_DIR / "flights_with_weather.csv", index=False)
