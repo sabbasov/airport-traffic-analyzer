@@ -49,7 +49,8 @@ def fetch_or_load(endpoint_name, paginate=False):
             total = pagination.get("total", 0)
             print(f"  > Progress: {len(all_data)} / {total}")
             
-            if len(all_data) >= total or not batch: break
+            if len(all_data) >= total or not batch:
+                break
             
             offset += limit
             time.sleep(1)
