@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 import pandas as pd
 import openmeteo_requests
+import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
@@ -11,7 +12,7 @@ CLEANED_DIR = DATA_DIR / "cleaned"
 DATA_DIR.mkdir(exist_ok=True)
 CLEANED_DIR.mkdir(parents=True, exist_ok=True)
 
-API_KEY = "285122daf0a57d6e80a80ed9d132_REPLACE_WITH_YOURS" # Ensure this is your key
+API_KEY = "285122daf0a57d6e80a80ed9d132b1da"
 BASE_URL = "https://api.aviationstack.com/v1"
 
 FETCH_FROM_API = False 
@@ -86,35 +87,50 @@ unique_locations = weather_tasks.drop_duplicates(subset=["departure_iata", "flig
 
 if not unique_locations.empty:
     openmeteo = openmeteo_requests.Client()
-    url = "https://archive-api.open-meteo.com/v1/archive"
-
-    params = {
-        "latitude": unique_locations["latitude"].tolist(),
-        "longitude": unique_locations["longitude"].tolist(),
-        "start_date": unique_locations["flight_date_str"].min(),
-        "end_date": unique_locations["flight_date_str"].max(),
-        "hourly": ["wind_speed_10m"],
-        "timezone": "UTC"
-    }
-
-    responses = openmeteo.weather_api(url, params=params)
-
+    
+    today = datetime.date.today()
+    
     weather_list = []
-    for i, response in enumerate(responses):
-        hourly = response.Hourly()
-        times = pd.date_range(
-            start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-            end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-            freq=pd.Timedelta(seconds=hourly.Interval()),
-            inclusive="left"
-        )
-        weather_list.append(pd.DataFrame({
-            "weather_time": times,
-            "wind_speed_10m": hourly.Variables(0).ValuesAsNumpy(),
-            "departure_iata": unique_locations.iloc[i]["departure_iata"]
-        }))
+    
+    for i, row in unique_locations.iterrows():
+        flight_date = pd.to_datetime(row["flight_date_str"]).date()
+        
+        if flight_date < today:
+            url = "https://archive-api.open-meteo.com/v1/archive"
+        else:
+            url = "https://api.open-meteo.com/v1/forecast"
 
-    weather_bank = pd.concat(weather_list).sort_values("weather_time")
+        params = {
+            "latitude": row["latitude"],
+            "longitude": row["longitude"],
+            "start_date": row["flight_date_str"],
+            "end_date": row["flight_date_str"],
+            "hourly": ["wind_speed_10m"],
+            "timezone": "UTC"
+        }
+
+        try:
+            responses = openmeteo.weather_api(url, params=params)
+            response = responses[0]
+            
+            hourly = response.Hourly()
+            times = pd.date_range(
+                start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
+                end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+                freq=pd.Timedelta(seconds=hourly.Interval()),
+                inclusive="left"
+            )
+            
+            weather_list.append(pd.DataFrame({
+                "weather_time": times,
+                "wind_speed_10m": hourly.Variables(0).ValuesAsNumpy(),
+                "departure_iata": row["departure_iata"]
+            }))
+        except Exception as e:
+            print(f"Could not get weather for {row['departure_iata']} on {row['flight_date_str']}: {e}")
+
+    if weather_list:
+        weather_bank = pd.concat(weather_list).sort_values("weather_time")
 
     flights = flights.sort_values("departure_estimated")
     final_df = pd.merge_asof(

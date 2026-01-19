@@ -1,0 +1,85 @@
+---
+title: "Airport Traffic and Weather Analysis"
+author: "Sabuhi Abbasov"
+format: html
+editor: visual
+execute:
+  echo: true
+---
+
+```{r setup, include=FALSE}
+library(reticulate)
+
+use_virtualenv("./.venv", required = TRUE)
+
+library(tidyverse)
+```
+
+```{r load-data, include = FALSE}
+flights_data <- read_csv("data/cleaned/flights_with_weather.csv")
+```
+
+```{r visualization, echo = FALSE, warning = FALSE}
+# a histogram of wind speeds at departure
+ggplot(flights_data, aes(x = wind_speed_10m)) +
+  geom_histogram(binwidth = 2, fill = "steelblue", color = "white") +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Wind Speeds at Departure",
+    subtitle = paste("Based on", nrow(flights_data), "recorded flights"),
+    x = "Wind Speed (km/h)",
+    y = "Frequency"
+  )
+```
+
+```{r top-windy-airports, echo = FALSE}
+# average wind speed per airport
+windy_airports <- flights_data |>
+  group_by(departure_iata) |>
+  summarise(
+    avg_wind = mean(wind_speed_10m, na.rm = TRUE),
+    flight_count = n()
+  ) |>
+  filter(flight_count > 5) |>
+  arrange(desc(avg_wind))
+
+head(windy_airports)
+```
+
+## Python
+```{python}
+import pandas as pd
+from pathlib import Path
+
+data_path = Path("data/cleaned/flights_with_weather.csv")
+
+py_flights = pd.read_csv(data_path)
+
+print(f"{len(py_flights)} rows loaded.")
+```
+
+## R
+```{r}
+flights_from_python <- py$py_flights
+```
+
+```{r time-transformation}
+library(lubridate)
+
+flights_from_python <- flights_from_python |>
+  mutate(
+    dep_time_clean = as_datetime(departure_estimated),
+    hour_of_day = hour(dep_time_clean),
+    day_of_week = wday(dep_time_clean, label = TRUE)
+  )
+
+hourly_delay <- flights_from_python |>
+  group_by(hour_of_day) |>
+  summarise(
+    avg_delay = mean(departure_delay, na.rm = TRUE),
+    flight_count = n()
+  ) |>
+  arrange(hour_of_day)
+
+na.omit(hourly_delay)
+```
