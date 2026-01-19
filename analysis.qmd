@@ -1,11 +1,17 @@
 ---
 title: "Airport Traffic and Weather Analysis"
 author: "Sabuhi Abbasov"
-format: html
+format:
+  html:
+    toc: true
+  gfm:
+    output-file: "README.md"
 editor: visual
 execute:
   echo: true
 ---
+
+<!-- To render README: quarto render analysis.qmd --to gfm -->
 
 ```{r setup, include=FALSE}
 library(reticulate)
