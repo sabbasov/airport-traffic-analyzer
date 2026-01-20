@@ -32,7 +32,7 @@ ggplot(flights_data, aes(x = wind_speed_10m)) +
   theme_minimal() +
   labs(
     title = "Distribution of Wind Speeds at Departure",
-    subtitle = paste("Based on", nrow(flights_data), "recorded flights"),
+    subtitle = paste("Based on", nrow(flights_data), "flights"),
     x = "Wind Speed (km/h)",
     y = "Frequency"
   )
@@ -60,8 +60,6 @@ from pathlib import Path
 data_path = Path("data/cleaned/flights_with_weather.csv")
 
 py_flights = pd.read_csv(data_path)
-
-print(f"{len(py_flights)} rows loaded.")
 ```
 
 ## R
