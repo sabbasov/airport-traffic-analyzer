@@ -1,6 +1,8 @@
 # Airport Traffic and Weather Analysis
 Sabuhi Abbasov
 
+<!-- To render README: quarto render analysis.qmd --to gfm -->
+
 ![](analysis_files/figure-commonmark/visualization-1.png)
 
     # A tibble: 6 × 3
@@ -22,11 +24,7 @@ from pathlib import Path
 data_path = Path("data/cleaned/flights_with_weather.csv")
 
 py_flights = pd.read_csv(data_path)
-
-print(f"{len(py_flights)} rows loaded.")
 ```
-
-    200 rows loaded.
 
 ## R
 
