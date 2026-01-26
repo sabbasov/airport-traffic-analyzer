@@ -15,7 +15,7 @@ CLEANED_DIR.mkdir(parents=True, exist_ok=True)
 API_KEY = "285122daf0a57d6e80a80ed9d132b1da"
 BASE_URL = "https://api.aviationstack.com/v1"
 
-FETCH_FROM_API = False 
+FETCH_FROM_API = False
 
 ENDPOINTS = {
     "flights": "flights",
@@ -144,3 +144,7 @@ if not unique_locations.empty:
 
     success_rate = final_df["wind_speed_10m"].notna().mean() * 100
     final_df.to_csv(CLEANED_DIR / "flights_with_weather.csv", index=False)
+    print(f"Successfully saved flights with weather data. Weather match rate: {success_rate:.1f}%")
+else:
+    flights.to_csv(CLEANED_DIR / "flights.csv", index=False)
+    print("Saved basic flights data (no weather data available)")
