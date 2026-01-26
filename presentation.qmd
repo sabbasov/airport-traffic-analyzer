@@ -6,221 +6,105 @@ date: today
 format:
   revealjs:
     theme: [dark, default]
-    background-color: "#0d1117"  # GitHub Dark Dimmed background
-    text-color: "#c9d1d9"        # Soft white/grey text
-    accent-color: "#58a6ff"      # Tech blue accent
-    selection-color: "#1f6feb"
-    transition: fade
+    background-color: "#0d1117"
+    text-color: "#c9d1d9"
+    accent-color: "#58a6ff"
+    transition: slide
     transition-speed: fast
-    footer: "SYSTEM_STATUS: STABLE // airline-traffic-analyzer"
-    slide-number: "c/t"          # Current/Total for a dev look
-    chalkboard: false
-    preview-links: auto
-    width: 1600                  # Wider aspect for side-by-side code/viz
+    footer: "SYSTEM_STATUS: <span style='color:#3fb950'>● ONLINE</span> // airline-traffic-analyzer"
+    slide-number: "c/t"
+    width: 1600
     height: 900
     margin: 0.05
-    highlight-style: github-dark # Matches the VS Code feel
+    highlight-style: github-dark
     code-copy: true
-    code-line-numbers: true
 embed-resources: true
 css: |
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;700&display=swap');
   
   :root {
     --r-main-font: 'Inter', sans-serif;
     --r-heading-font: 'IBM Plex Mono', monospace;
     --r-code-font: 'IBM Plex Mono', monospace;
-    --r-link-color: #58a6ff;
-    --r-selection-background-color: #1f6feb;
   }
+
+  /* Sublte Developer Grid Background */
+  .reveal {
+    background-image: 
+      radial-gradient(#1f242c 1px, transparent 1px), 
+      radial-gradient(#1f242c 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+  }
+
   .reveal h1, .reveal h2, .reveal h3 {
     text-transform: uppercase;
     letter-spacing: -1px;
-    font-weight: 600;
+    font-weight: 700;
     color: #79c0ff;
+    text-shadow: 0 0 15px rgba(121, 192, 255, 0.2);
   }
-  .reveal h1 { border-bottom: 2px solid #30363d; padding-bottom: 10px; }
-  .reveal .slide-number { background-color: transparent; color: #8b949e; font-family: var(--r-code-font); }
-  .reveal .footer { font-family: var(--r-code-font); color: #8b949e; font-size: 0.5em; text-transform: uppercase; letter-spacing: 2px; }
-  pre { border: 1px solid #30363d !important; border-radius: 12px !important; background: #161b22 !important; }
-  code { color: #ffa657 !important; } /* Variable/logic highlight color */
-  .stat-block { border: 1px solid #30363d; background: linear-gradient(145deg, #161b22, #0d1117); }
-  .reveal .progress { height: 4px; color: #58a6ff; }
----
 
-## Problem Statement
+  /* Code Block Styling - Terminal Style */
+  .reveal pre {
+    border: 1px solid #30363d !important;
+    border-top: 25px solid #161b22 !important; /* Terminal Title Bar */
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    position: relative;
+  }
+  
+  .reveal pre::before {
+    content: "● ● ●";
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    color: #484f58;
+    font-size: 12px;
+  }
 
-Data-driven operations require real-time insights. Current flight analytics systems:
-- **Lack integration** across multiple data sources
-- **React late** to emerging patterns
-- **Miss predictive opportunities** in temporal data
+  /* Glassmorphism Stat Blocks */
+  .stat-block {
+    background: rgba(22, 27, 34, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid #30363d;
+    border-left: 4px solid #58a6ff;
+    border-radius: 8px;
+    padding: 25px;
+    transition: all 0.3s ease;
+  }
 
-```python
-# Core question: Can we predict delays 
-# from weather + temporal patterns?
-```
+  .stat-block:hover {
+    border-color: #79c0ff;
+    box-shadow: 0 0 20px rgba(88, 166, 255, 0.2);
+  }
 
----
+  .stat-value {
+    font-size: 2.8em !important;
+    color: #3fb950; /* Green for "Values" */
+    font-family: var(--r-code-font);
+  }
 
-## Architecture Overview
+  /* Tech Stack Grid */
+  .tech-item {
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 0.8em;
+  }
 
-<div class="two-column">
-<div class="column-left">
+  .tech-item strong {
+    color: #d2a8ff; /* Purple for key labels */
+  }
 
-**Data Ingestion Pipeline**
-- Aviation Stack API (real-time)
-- Open-Meteo API (weather)
-- 897 flights collected
-- Multi-source temporal alignment
-
-**Processing & ML**
-- Python data pipeline
-- R tidymodels framework
-- Random Forest regressor
-- 5-fold cross-validation
-
-</div>
-<div class="column-right">
-
-**Visualization & Analysis**
-- Interactive Shiny dashboard
-- Plotly-powered exploration
-- Quarto-generated reports
-- Residual & performance analysis
-
-</div>
-</div>
-
----
-
-## Data Pipeline: Live API Integration
-
-```python
-# Fetch real-time flights
-response = requests.get(
-  f"https://api.aviationstack.com/v1/flights",
-  params={"access_key": API_KEY}
-)
-
-flights_data = response.json()["data"]
-
-# Historical collection (7-day lookback)
-for days_back in range(1, 8):
-  flight_date = (today - timedelta(days=days_back))
-  historical = fetch_flights(flight_date)
-  flights_data.extend(historical)
-```
-
-**Result:** 897 flights with 59 features each
-
----
-
-## Data Integration: Temporal Weather Matching
-
-The challenge: match 800+ flights to hourly weather observations across timezones.
-
-```r
-# Merge flights with nearest hourly wind observation
-final_df <- merge_asof(
-  flights |> arrange(departure_estimated),
-  weather_bank |> arrange(weather_time),
-  left_on = "departure_estimated",
-  right_on = "weather_time",
-  by = "departure_iata",
-  direction = "nearest"
-)
-
-# Success rate
-success_rate <- final_df$wind_speed_10m |> is.na() |> mean()
-# → 97.9% match rate
-```
-
-<div class="stat-block">
-<div class="stat-value">97.9%</div>
-<div class="stat-label">Weather match rate across temporal alignment</div>
-</div>
-
----
-
-## Data Landscape
-
-<div class="two-column">
-<div class="column-left">
-
-<div class="stat-block">
-<div class="stat-value">897</div>
-<div class="stat-label">Total flights</div>
-</div>
-
-<div class="stat-block">
-<div class="stat-value">139</div>
-<div class="stat-label">Unique airlines</div>
-</div>
-
-<div class="stat-block">
-<div class="stat-value">59</div>
-<div class="stat-label">Features per record</div>
-</div>
-
-</div>
-<div class="column-right">
-
-<div class="stat-block">
-<div class="stat-value">0–616 min</div>
-<div class="stat-label">Departure delay range</div>
-</div>
-
-<div class="stat-block">
-<div class="stat-value">0.36–42 km/h</div>
-<div class="stat-label">Wind speed range</div>
-</div>
-
-<div class="stat-block">
-<div class="stat-value">9.92 min</div>
-<div class="stat-label">Average delay</div>
-</div>
-
-</div>
-</div>
-
----
-
-## Machine Learning Pipeline
-
-<div class="two-column">
-<div class="column-left">
-
-**Model Configuration**
-- Algorithm: Random Forest (ranger)
-- Train/test split: 80/20
-- Training samples: 637
-- Test samples: 160
-- Features: 20+ engineered
-- CV strategy: 5-fold
-
-</div>
-<div class="column-right">
-
-**Hyperparameter Tuning**
-- mtry: 5, 10, 15
-- min_n: 2, 5, 10
-- Grid search exhaustive
-- Best params selected
-- Residual validation
-
-</div>
-</div>
-
-```r
-ranger_model <- rand_forest(
-  mtry = tune(),
-  min_n = tune(),
-  engine = "ranger",
-  mode = "regression"
-) %>%
-  set_engine("ranger", importance = "impurity")
-```
-
+  /* Highlight Accents */
+  .highlight-accent {
+    color: #58a6ff;
+    background: rgba(88, 166, 255, 0.1);
+    padding: 0 5px;
+    border-radius: 4px;
+  }
 ---
 
 ## Model Performance
