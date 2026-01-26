@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "airport-traffic-analyzer"
 version = "0.1.0"
@@ -6,5 +10,9 @@ description = "A real-time dashboard for monitoring airport traffic and airline 
 dependencies = [
     "pandas",
     "requests",
-    "scikit-learn"
+    "scikit-learn",
+    "openmeteo-requests"
 ]
+
+[tool.setuptools]
+packages = ["scripts"]

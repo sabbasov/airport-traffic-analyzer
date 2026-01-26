@@ -35,7 +35,14 @@ create_python_env() {
 setup_r_packages() {
   echo ""
   echo "Installing R packages..."
-  Rscript install_r_packages.R
+  R --silent --no-echo --no-save -e "
+    packages <- c('tidyverse', 'tidymodels', 'shiny', 'plotly', 'lubridate', 'DT', 'ranger', 'vip')
+    for (pkg in packages) {
+      if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+        install.packages(pkg, repos='https://cran.r-project.org/')
+      }
+    }
+  "
   echo "✓ R packages installed"
 }
 

@@ -5,3 +5,4 @@ airport_traffic_analyzer.egg-info/SOURCES.txt
 airport_traffic_analyzer.egg-info/dependency_links.txt
 airport_traffic_analyzer.egg-info/requires.txt
 airport_traffic_analyzer.egg-info/top_level.txt
+scripts/fetch_data.py

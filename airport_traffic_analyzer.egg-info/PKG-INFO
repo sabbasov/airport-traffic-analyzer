@@ -6,3 +6,4 @@ Requires-Python: >=3.12.4
 Requires-Dist: pandas
 Requires-Dist: requests
 Requires-Dist: scikit-learn
+Requires-Dist: openmeteo-requests
