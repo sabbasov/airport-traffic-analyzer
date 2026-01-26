@@ -7,3 +7,4 @@ Requires-Dist: pandas
 Requires-Dist: requests
 Requires-Dist: scikit-learn
 Requires-Dist: openmeteo-requests
+Requires-Dist: python-dotenv

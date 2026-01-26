@@ -11,7 +11,8 @@ dependencies = [
     "pandas",
     "requests",
     "scikit-learn",
-    "openmeteo-requests"
+    "openmeteo-requests",
+    "python-dotenv"
 ]
 
 [tool.setuptools]

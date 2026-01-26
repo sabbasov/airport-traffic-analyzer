@@ -1,3 +1,33 @@
 *.pyc
 *.pyo
 __pycache__/
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables (keep API keys private!)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Data (generated)
+data/cleaned/*.csv
+data/*.json
+data/.historical_dates_fetched.json
+
+# R outputs
+.Rhistory
+*.html
+analysis_files/
+figure-*/
+
+# Large files  
+*.parquet
