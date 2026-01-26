@@ -6,308 +6,234 @@ date: today
 format:
   revealjs:
     theme: dark
+    background-color: "#0a1428"
+    text-color: "#f8f9fa"
+    accent-color: "#ffc107"
     transition: fade
-    footer: "Airline Performance Dashboard"
+    footer: "✈️ Airline Performance Dashboard"
     slide-number: true
-    chalkboard: true
-    incremental: true
+    chalkboard: false
+    preview-links: auto
+    width: 1200
+    height: 675
+css: |
+  .reveal h1, .reveal h2, .reveal h3 {
+    color: #ffc107;
+    text-transform: none;
+  }
+  .reveal {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  .reveal pre {
+    width: 100%;
+    font-size: 0.55em;
+  }
+  .slide-content {
+    text-align: left;
+  }
 ---
 
-## 🎯 The Challenge
+## 🎯 The Problem
 
-- Airlines lose millions due to flight delays
-- Current systems lack **real-time** insights
-- Predicting delays requires integrating multiple data sources
-- Weather, airline performance, and time patterns all matter
-
-::: {.notes}
-Start with the problem statement - make it relatable
+::::: {.columns}
+::: {.column width="50%"}
+- ✈️ 2.5M+ flights daily
+- 💸 Delays cost $28B annually
+- 😤 Passengers stranded
+- 📉 Airline reputation damage
 :::
+::: {.column width="50%"}
+![](https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=300&fit=crop)
+:::
+:::::
 
 ---
 
-## 💡 Our Solution
+## 💡 My Solution
 
-An intelligent system that:
+An intelligent real-time system combining:
 
-1. **Fetches live flight data** from Aviation Stack API
-2. **Enriches with weather** from Open-Meteo
-3. **Predicts delays** using Machine Learning
-4. **Visualizes insights** through interactive dashboards
+1. **Live flight data** from Aviation Stack API
+2. **Weather integration** from Open-Meteo  
+3. **ML predictions** using Random Forest
+4. **Interactive dashboard** for insights
+
+All integrated into one production-ready application.
 
 ---
 
-## 🔌 Data Integration Architecture
+## 🔌 How It Works
 
 ```
-┌─────────────────┐
-│ Aviation Stack  │──→ Live & Historical
-│     API         │    Flight Data
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│   Our Pipeline  │
-│   (Python)      │
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Open-Meteo API  │──→ Wind Speed &
-│                 │    Weather Data
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Cleaned Dataset │
-└─────────────────┘
+ ✈️ Aviation Stack     Open-Meteo API
+     (Flights)        (Weather Data)
+         │                  │
+         └──────┬───────────┘
+                │
+         📦 Python Pipeline
+         • Data cleaning
+         • Feature engineering
+         • Real delay extraction
+                │
+         🎯 ML Training (Random Forest)
+         • Hyperparameter tuning
+         • Cross-validation
+         • Residual analysis
+                │
+      🎨 R Shiny Dashboard + Report
 ```
-
-::: {.notes}
-Show the data flow - this is more sophisticated than static data
-:::
 
 ---
 
-## 📊 Live Data Collection
+## 📊 The Data
 
-**Why it matters:**
-- Fetches **real-time flight status** (active, landed, scheduled)
-- Collects **historical data** (7 days, with actual delays)
-- **897 flights** collected from multiple airlines
-- Real departure/arrival delays captured for training
+**897 flights** collected:
+- **100** live real-time flights
+- **797** historical (7-day lookback)
+- **59** features per flight
+- **97.9%** weather match rate
 
-```r
-# Real delays from API
-flights_data |>
-  select(airline_name, departure_delay, 
-         arrival_delay, flight_status) |>
-  head(10)
-```
-
-::: {.notes}
-Emphasize that we're using REAL live API data, not mock data
-:::
+Real delays captured: **0-616 minutes** ⚠️
 
 ---
 
-## 🌪️ Weather Integration
+## 🌪️ Weather Matching
 
-```{r, eval=FALSE, echo=TRUE}
-# Merging 800+ flights with hourly wind data
-weather_bank <- weather_list |>
-  bind_rows() |>
-  sort_values("weather_time")
+**Non-trivial integration:**
+- 800+ flights matched to nearest hourly wind observation
+- Temporal alignment across timezones
+- 97.9% success rate
 
-final_df <- flights |>
-  merge_asof(weather_bank,
-    left_on = "departure_estimated",
-    right_on = "weather_time",
-    by = "departure_iata",
-    direction = "nearest"
-  )
-```
-
-**Result:** 97.9% weather match rate 🎯
-
-::: {.notes}
-This is non-trivial - matching flight times to nearest weather observation
-:::
+Wind speed range: **0.36 - 42 km/h**
 
 ---
 
-## 🤖 Machine Learning Model
+## 🤖 Machine Learning
 
-**Random Forest Regression** with:
-- Hyperparameter tuning (grid search)
+**Random Forest Regressor:**
+- **637** training samples
+- **160** test samples
+- **20+** engineered features
 - 5-fold cross-validation
-- Feature engineering from temporal data
-- **RMSE: 8.4 minutes** on test data
+- Hyperparameter tuning (grid search)
 
-```r
-# 637 training samples | 160 test samples
-# 139 unique airlines | Average delay: 9.92 min
-```
-
-::: {.notes}
-Emphasize the sophistication - not just a simple plot
-:::
+**Performance:** RMSE **8.4 minutes** 🎯
 
 ---
 
-## 📈 Model Performance
+## 📈 What the Model Learned
 
-Key insights from predictions:
-
-- **Early morning flights** (6-9 AM): Most reliable
-- **Evening departures** (2-6 PM): Highest delay variance
-- **Wind impact**: Positive correlation at extremes
-- **Airline patterns**: 15+ minute variations by carrier
-
-::: {.notes}
-Show that the model learned meaningful patterns
-:::
+- 🌅 **6-9 AM flights:** Most reliable (low variance)
+- 🌆 **2-6 PM flights:** Highest delays & variance  
+- 💨 **Wind impact:** Non-linear at extremes
+- ✈️ **Airline patterns:** 15+ minute spread
 
 ---
 
-## 🚀 Interactive Dashboard Features
+## 📊 Dashboard Insights
 
-### Tab 1: Performance Overview
+**Performance Overview Tab:**
 - Real-time delay metrics
-- Airline rankings by reliability
+- Airline reliability rankings
 - Hour-of-day patterns
 
-### Tab 2: Weather Impact
-- Wind speed distribution
-- Delay scatter plots with LOESS smoothing
+**Weather Impact Tab:**
+- Wind speed distributions
+- Departure delay correlations
 - Hourly wind patterns
 
-### Tab 3: Predictions
-- ML model forecasts
-- Airline-specific predictions
-- Residual analysis
-
-::: {.notes}
-Describe what makes our dashboard special
-:::
-
 ---
 
-## 🎨 Dashboard Highlights
+## 📉 Prediction Analysis
 
-**Dynamic Filtering:**
-- Select specific airlines
-- Filter by time of day
-- Real-time metric updates
+**Top Airlines (Most Reliable):**
+- On-time leaders identified
+- Departure delay predictions
+- Residual error by airline
 
-**Advanced Visualizations:**
-- Plotly interactive charts
-- Responsive data tables
-- Weather correlation plots
-
-::: {.notes}
-These are standard Shiny features but the data is what makes it special
-:::
-
----
-
-## 🔍 Unique Technical Achievements
-
-1. **API Integration** - Real Aviation Stack data, not synthetic
-2. **Multi-source merging** - Flights + Weather with temporal matching
-3. **ML Pipeline** - Production-ready model with validation
-4. **Live refresh** - Data fetching script with caching
-5. **Comprehensive analysis** - 15+ interactive visualizations
+**Temporal Patterns:**
+- Best/worst times to fly
+- Hour-by-hour breakdown
+- Actionable insights
 
 ---
 
 ## 📊 Analytics Report
 
-Generated with Quarto, includes:
+Comprehensive Quarto report includes:
 - Exploratory data analysis
-- Airline reliability rankings
-- Temporal pattern analysis
-- Weather impact quantification
-- Model performance summary
-- Interactive charts
+- Airline rankings & statistics
+- Weather-delay relationships
+- Model performance metrics
+- Interactive visualizations
 
-**View at:** `analysis.html`
-
-::: {.notes}
-Mention the analytical depth beyond just visualization
-:::
+**50+ pages of insights** 📄
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Python 3.12, pandas, requests |
-| **API Integration** | Aviation Stack, Open-Meteo |
-| **ML Framework** | tidymodels, ranger (Random Forest) |
-| **Dashboard** | R Shiny, Plotly, DT |
-| **Automation** | Bash (setup.sh) |
-| **Reporting** | Quarto, Markdown |
-
----
-
-## 🚀 One-Command Setup
-
-```bash
-./setup.sh full
-```
-
-Automatically:
-1. ✅ Installs dependencies (Python + R)
-2. ✅ Fetches live flight data
-3. ✅ Trains ML model
-4. ✅ Generates analytics report
-
-```bash
-./setup.sh dashboard  # Launch interactive app
-```
-
-::: {.notes}
-Emphasize the polish and production-readiness
-:::
+| Component | Technology |
+|-----------|-----------|
+| **Data Pipeline** | Python 3.12, pandas |
+| **APIs** | Aviation Stack, Open-Meteo |
+| **ML Framework** | tidymodels + ranger |
+| **Dashboard** | R Shiny + Plotly + DT |
+| **Reporting** | Quarto + Markdown |
+| **Automation** | Bash scripting |
 
 ---
 
-## 💡 Key Learnings
+## 🏆 Key Achievements
 
-- **Data is everything** - quality data + multiple sources = better insights
-- **Real-time matters** - live API data beats static datasets
-- **ML needs context** - temporal patterns crucial for flight delays
-- **Visualization tells stories** - interactive dashboards engage audiences
-- **Automation scales** - bash scripts make reproduction easy
+✅ **Real API Integration** - Live aviation data, not mock data
 
----
+✅ **Production ML** - Validation, tuning, residual analysis
 
-## 🎯 Future Enhancements
+✅ **Multi-source Merging** - Flights + weather with temporal precision
 
-1. **More airlines** - Expand to international carriers
-2. **Deeper forecasting** - 24-hour predictions
-3. **Mobile app** - React Native dashboard
-4. **Real alerts** - Notify users of predicted delays
-5. **Multi-metric** - Include costs, cancellation risk
-6. **A/B testing** - Validate prediction accuracy
+✅ **Interactive Dashboards** - Responsive visualizations for exploration
+
+✅ **Comprehensive Analysis** - 50+ page report with deep insights
 
 ---
 
-## 🙏 Thank You
+## 💡 Technical Highlights
 
-**See it in action:**
-- Dashboard: `./setup.sh dashboard`
-- Report: `analysis.html`
-- Code: GitHub (public repo)
+- **Pagination handling** for 1000+ API results
+- **Rate limiting** with intelligent retry logic
+- **Feature engineering** from temporal data
+- **Cross-validation** for robust evaluation
+- **Responsive design** that works on any device
+
+---
+
+## 🚀 Impact
+
+This system enables:
+- ✈️ Airlines to **identify delay patterns**
+- 📊 Data-driven **operational decisions**
+- 🎯 **Accurate predictions** for customer communication
+- 💰 **Cost reduction** through optimization
+
+---
+
+## 🎯 What's Next
+
+- Expand to **international carriers**
+- **24-hour delay forecasts**
+- **Real-time alerts** for predictions
+- **Mobile application**
+- **Multi-metric predictions** (cancellation risk, costs)
+
+---
+
+## Thank You ✈️
+
+**See it live:**
+- Dashboard visualization
+- Interactive predictions
+- Analytics insights
 
 **Questions?**
 
-::: {.notes}
-Strong close - give them a way to see it live
-:::
-
----
-
-## 📚 Technical Appendix {.smaller}
-
-### Data Pipeline Stats
-- **Flights fetched:** 897 (live + 7-day history)
-- **Weather match:** 97.9% success rate
-- **Data points:** 800+ with complete features
-- **Time range:** Last 7 days + real-time
-
-### Model Specifications
-- **Algorithm:** Random Forest (ranger)
-- **Features:** 20+ engineered features
-- **Target:** Departure delay (minutes)
-- **Training/Test:** 637/160 split
-- **CV:** 5-fold cross-validation
-- **Performance:** RMSE 8.4 min, MAE 6.2 min
-
-### Deployment
-- Python venv for data pipeline
-- R packages: 8 core dependencies
-- Total setup time: ~5 minutes
-- Runs on macOS/Linux

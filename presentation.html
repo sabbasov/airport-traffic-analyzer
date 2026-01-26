@@ -29,79 +29,25 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-      }
-    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-    div.sourceCode
-      { color: #f8f8f2;  }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #f8f8f2; } /* Normal */
-    code span.al { color: #f07178; } /* Alert */
-    code span.an { color: #d4d0ab; } /* Annotation */
-    code span.at { color: #00e0e0; } /* Attribute */
-    code span.bn { color: #d4d0ab; } /* BaseN */
-    code span.bu { color: #abe338; } /* BuiltIn */
-    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #abe338; } /* Char */
-    code span.cn { color: #ffd700; } /* Constant */
-    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
-    code span.cv { color: #ffd700; } /* CommentVar */
-    code span.do { color: #f8f8f2; } /* Documentation */
-    code span.dt { color: #ffa07a; } /* DataType */
-    code span.dv { color: #d4d0ab; } /* DecVal */
-    code span.er { color: #f07178; text-decoration: underline; } /* Error */
-    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
-    code span.fl { color: #d4d0ab; } /* Float */
-    code span.fu { color: #ffa07a; } /* Function */
-    code span.im { color: #abe338; } /* Import */
-    code span.in { color: #d4d0ab; } /* Information */
-    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
-    code span.op { color: #ffa07a; } /* Operator */
-    code span.ot { color: #00e0e0; } /* Other */
-    code span.pp { color: #dcc6e0; } /* Preprocessor */
-    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
-    code span.sc { color: #abe338; } /* SpecialChar */
-    code span.ss { color: #abe338; } /* SpecialString */
-    code span.st { color: #abe338; } /* String */
-    code span.va { color: #00e0e0; } /* Variable */
-    code span.vs { color: #abe338; } /* VerbatimString */
-    code span.wa { color: #dcc6e0; } /* Warning */
   </style>
   <link rel="stylesheet" href="presentation_files/libs/revealjs/dist/theme/quarto-327cab17de08e4a17faa7d61f48ae591.css">
+  <link rel="stylesheet" href=".reveal h1, .reveal h2, .reveal h3 {
+  color: #ffc107;
+  text-transform: none;
+}
+.reveal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.reveal pre {
+  width: 100%;
+  font-size: 0.55em;
+}
+.slide-content {
+  text-align: left;
+}">
   <link href="presentation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="presentation_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
-  <link href="presentation_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
@@ -209,376 +155,170 @@ Sabuhi Abbasov
 
   <p class="date">2026-01-25</p>
 </section>
-<section id="the-challenge" class="slide level2">
-<h2>🎯 The Challenge</h2>
+<section id="the-problem" class="slide level2">
+<h2>🎯 The Problem</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li class="fragment">Airlines lose millions due to flight delays</li>
-<li class="fragment">Current systems lack <strong>real-time</strong> insights</li>
-<li class="fragment">Predicting delays requires integrating multiple data sources</li>
-<li class="fragment">Weather, airline performance, and time patterns all matter</li>
+<li>✈️ 2.5M+ flights daily</li>
+<li>💸 Delays cost $28B annually</li>
+<li>😤 Passengers stranded</li>
+<li>📉 Airline reputation damage</li>
 </ul>
-<aside class="notes">
-<p>Start with the problem statement - make it relatable</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+</div><div class="column" style="width:50%;">
+<p><img data-src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&amp;h=300&amp;fit=crop.png"></p>
+</div></div>
 </section>
-<section id="our-solution" class="slide level2">
-<h2>💡 Our Solution</h2>
-<p>An intelligent system that:</p>
+<section id="my-solution" class="slide level2">
+<h2>💡 My Solution</h2>
+<p>An intelligent real-time system combining:</p>
 <ol type="1">
-<li class="fragment"><strong>Fetches live flight data</strong> from Aviation Stack API</li>
-<li class="fragment"><strong>Enriches with weather</strong> from Open-Meteo</li>
-<li class="fragment"><strong>Predicts delays</strong> using Machine Learning</li>
-<li class="fragment"><strong>Visualizes insights</strong> through interactive dashboards</li>
+<li><strong>Live flight data</strong> from Aviation Stack API</li>
+<li><strong>Weather integration</strong> from Open-Meteo<br>
+</li>
+<li><strong>ML predictions</strong> using Random Forest</li>
+<li><strong>Interactive dashboard</strong> for insights</li>
 </ol>
+<p>All integrated into one production-ready application.</p>
 </section>
-<section id="data-integration-architecture" class="slide level2">
-<h2>🔌 Data Integration Architecture</h2>
-<pre><code>┌─────────────────┐
-│ Aviation Stack  │──→ Live &amp; Historical
-│     API         │    Flight Data
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│   Our Pipeline  │
-│   (Python)      │
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Open-Meteo API  │──→ Wind Speed &amp;
-│                 │    Weather Data
-└─────────────────┘
-         │
-         ↓
-┌─────────────────┐
-│ Cleaned Dataset │
-└─────────────────┘</code></pre>
-<aside class="notes">
-<p>Show the data flow - this is more sophisticated than static data</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="how-it-works" class="slide level2">
+<h2>🔌 How It Works</h2>
+<pre><code> ✈️ Aviation Stack     Open-Meteo API
+     (Flights)        (Weather Data)
+         │                  │
+         └──────┬───────────┘
+                │
+         📦 Python Pipeline
+         • Data cleaning
+         • Feature engineering
+         • Real delay extraction
+                │
+         🎯 ML Training (Random Forest)
+         • Hyperparameter tuning
+         • Cross-validation
+         • Residual analysis
+                │
+      🎨 R Shiny Dashboard + Report</code></pre>
 </section>
-<section id="live-data-collection" class="slide level2">
-<h2>📊 Live Data Collection</h2>
-<p><strong>Why it matters:</strong> - Fetches <strong>real-time flight status</strong> (active, landed, scheduled) - Collects <strong>historical data</strong> (7 days, with actual delays) - <strong>897 flights</strong> collected from multiple airlines - Real departure/arrival delays captured for training</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href=""></a><span class="co"># Real delays from API</span></span>
-<span id="cb2-2"><a href=""></a>flights_data <span class="sc">|&gt;</span></span>
-<span id="cb2-3"><a href=""></a>  <span class="fu">select</span>(airline_name, departure_delay, </span>
-<span id="cb2-4"><a href=""></a>         arrival_delay, flight_status) <span class="sc">|&gt;</span></span>
-<span id="cb2-5"><a href=""></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<aside class="notes">
-<p>Emphasize that we’re using REAL live API data, not mock data</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="the-data" class="slide level2">
+<h2>📊 The Data</h2>
+<p><strong>897 flights</strong> collected: - <strong>100</strong> live real-time flights - <strong>797</strong> historical (7-day lookback) - <strong>59</strong> features per flight - <strong>97.9%</strong> weather match rate</p>
+<p>Real delays captured: <strong>0-616 minutes</strong> ⚠️</p>
 </section>
-<section id="weather-integration" class="slide level2">
-<h2>🌪️ Weather Integration</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href=""></a><span class="co"># Merging 800+ flights with hourly wind data</span></span>
-<span id="cb3-2"><a href=""></a>weather_bank <span class="ot">&lt;-</span> weather_list <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href=""></a>  <span class="fu">bind_rows</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href=""></a>  <span class="fu">sort_values</span>(<span class="st">"weather_time"</span>)</span>
-<span id="cb3-5"><a href=""></a></span>
-<span id="cb3-6"><a href=""></a>final_df <span class="ot">&lt;-</span> flights <span class="sc">|&gt;</span></span>
-<span id="cb3-7"><a href=""></a>  <span class="fu">merge_asof</span>(weather_bank,</span>
-<span id="cb3-8"><a href=""></a>    <span class="at">left_on =</span> <span class="st">"departure_estimated"</span>,</span>
-<span id="cb3-9"><a href=""></a>    <span class="at">right_on =</span> <span class="st">"weather_time"</span>,</span>
-<span id="cb3-10"><a href=""></a>    <span class="at">by =</span> <span class="st">"departure_iata"</span>,</span>
-<span id="cb3-11"><a href=""></a>    <span class="at">direction =</span> <span class="st">"nearest"</span></span>
-<span id="cb3-12"><a href=""></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>Result:</strong> 97.9% weather match rate 🎯</p>
-<aside class="notes">
-<p>This is non-trivial - matching flight times to nearest weather observation</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="weather-matching" class="slide level2">
+<h2>🌪️ Weather Matching</h2>
+<p><strong>Non-trivial integration:</strong> - 800+ flights matched to nearest hourly wind observation - Temporal alignment across timezones - 97.9% success rate</p>
+<p>Wind speed range: <strong>0.36 - 42 km/h</strong></p>
 </section>
-<section id="machine-learning-model" class="slide level2">
-<h2>🤖 Machine Learning Model</h2>
-<p><strong>Random Forest Regression</strong> with: - Hyperparameter tuning (grid search) - 5-fold cross-validation - Feature engineering from temporal data - <strong>RMSE: 8.4 minutes</strong> on test data</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href=""></a><span class="co"># 637 training samples | 160 test samples</span></span>
-<span id="cb4-2"><a href=""></a><span class="co"># 139 unique airlines | Average delay: 9.92 min</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<aside class="notes">
-<p>Emphasize the sophistication - not just a simple plot</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="machine-learning" class="slide level2">
+<h2>🤖 Machine Learning</h2>
+<p><strong>Random Forest Regressor:</strong> - <strong>637</strong> training samples - <strong>160</strong> test samples - <strong>20+</strong> engineered features - 5-fold cross-validation - Hyperparameter tuning (grid search)</p>
+<p><strong>Performance:</strong> RMSE <strong>8.4 minutes</strong> 🎯</p>
 </section>
-<section id="model-performance" class="slide level2">
-<h2>📈 Model Performance</h2>
-<p>Key insights from predictions:</p>
+<section id="what-the-model-learned" class="slide level2">
+<h2>📈 What the Model Learned</h2>
 <ul>
-<li class="fragment"><strong>Early morning flights</strong> (6-9 AM): Most reliable</li>
-<li class="fragment"><strong>Evening departures</strong> (2-6 PM): Highest delay variance</li>
-<li class="fragment"><strong>Wind impact</strong>: Positive correlation at extremes</li>
-<li class="fragment"><strong>Airline patterns</strong>: 15+ minute variations by carrier</li>
+<li>🌅 <strong>6-9 AM flights:</strong> Most reliable (low variance)</li>
+<li>🌆 <strong>2-6 PM flights:</strong> Highest delays &amp; variance<br>
+</li>
+<li>💨 <strong>Wind impact:</strong> Non-linear at extremes</li>
+<li>✈️ <strong>Airline patterns:</strong> 15+ minute spread</li>
 </ul>
-<aside class="notes">
-<p>Show that the model learned meaningful patterns</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
 </section>
-<section id="interactive-dashboard-features" class="slide level2">
-<h2>🚀 Interactive Dashboard Features</h2>
-<h3 id="tab-1-performance-overview">Tab 1: Performance Overview</h3>
-<ul>
-<li class="fragment">Real-time delay metrics</li>
-<li class="fragment">Airline rankings by reliability</li>
-<li class="fragment">Hour-of-day patterns</li>
-</ul>
-<h3 id="tab-2-weather-impact">Tab 2: Weather Impact</h3>
-<ul>
-<li class="fragment">Wind speed distribution</li>
-<li class="fragment">Delay scatter plots with LOESS smoothing</li>
-<li class="fragment">Hourly wind patterns</li>
-</ul>
-<h3 id="tab-3-predictions">Tab 3: Predictions</h3>
-<ul>
-<li class="fragment">ML model forecasts</li>
-<li class="fragment">Airline-specific predictions</li>
-<li class="fragment">Residual analysis</li>
-</ul>
-<aside class="notes">
-<p>Describe what makes our dashboard special</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="dashboard-insights" class="slide level2">
+<h2>📊 Dashboard Insights</h2>
+<p><strong>Performance Overview Tab:</strong> - Real-time delay metrics - Airline reliability rankings - Hour-of-day patterns</p>
+<p><strong>Weather Impact Tab:</strong> - Wind speed distributions - Departure delay correlations - Hourly wind patterns</p>
 </section>
-<section id="dashboard-highlights" class="slide level2">
-<h2>🎨 Dashboard Highlights</h2>
-<p><strong>Dynamic Filtering:</strong> - Select specific airlines - Filter by time of day - Real-time metric updates</p>
-<p><strong>Advanced Visualizations:</strong> - Plotly interactive charts - Responsive data tables - Weather correlation plots</p>
-<aside class="notes">
-<p>These are standard Shiny features but the data is what makes it special</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="unique-technical-achievements" class="slide level2">
-<h2>🔍 Unique Technical Achievements</h2>
-<ol type="1">
-<li class="fragment"><strong>API Integration</strong> - Real Aviation Stack data, not synthetic</li>
-<li class="fragment"><strong>Multi-source merging</strong> - Flights + Weather with temporal matching</li>
-<li class="fragment"><strong>ML Pipeline</strong> - Production-ready model with validation</li>
-<li class="fragment"><strong>Live refresh</strong> - Data fetching script with caching</li>
-<li class="fragment"><strong>Comprehensive analysis</strong> - 15+ interactive visualizations</li>
-</ol>
+<section id="prediction-analysis" class="slide level2">
+<h2>📉 Prediction Analysis</h2>
+<p><strong>Top Airlines (Most Reliable):</strong> - On-time leaders identified - Departure delay predictions - Residual error by airline</p>
+<p><strong>Temporal Patterns:</strong> - Best/worst times to fly - Hour-by-hour breakdown - Actionable insights</p>
 </section>
 <section id="analytics-report" class="slide level2">
 <h2>📊 Analytics Report</h2>
-<p>Generated with Quarto, includes: - Exploratory data analysis - Airline reliability rankings - Temporal pattern analysis - Weather impact quantification - Model performance summary - Interactive charts</p>
-<p><strong>View at:</strong> <code>analysis.html</code></p>
-<aside class="notes">
-<p>Mention the analytical depth beyond just visualization</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<p>Comprehensive Quarto report includes: - Exploratory data analysis - Airline rankings &amp; statistics - Weather-delay relationships - Model performance metrics - Interactive visualizations</p>
+<p><strong>50+ pages of insights</strong> 📄</p>
 </section>
-<section id="technology-stack" class="slide level2">
-<h2>🛠️ Technology Stack</h2>
+<section id="tech-stack" class="slide level2">
+<h2>🛠️ Tech Stack</h2>
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th>Layer</th>
+<th>Component</th>
 <th>Technology</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Backend</strong></td>
-<td>Python 3.12, pandas, requests</td>
+<td><strong>Data Pipeline</strong></td>
+<td>Python 3.12, pandas</td>
 </tr>
 <tr class="even">
-<td><strong>API Integration</strong></td>
+<td><strong>APIs</strong></td>
 <td>Aviation Stack, Open-Meteo</td>
 </tr>
 <tr class="odd">
 <td><strong>ML Framework</strong></td>
-<td>tidymodels, ranger (Random Forest)</td>
+<td>tidymodels + ranger</td>
 </tr>
 <tr class="even">
 <td><strong>Dashboard</strong></td>
-<td>R Shiny, Plotly, DT</td>
+<td>R Shiny + Plotly + DT</td>
 </tr>
 <tr class="odd">
-<td><strong>Automation</strong></td>
-<td>Bash (setup.sh)</td>
+<td><strong>Reporting</strong></td>
+<td>Quarto + Markdown</td>
 </tr>
 <tr class="even">
-<td><strong>Reporting</strong></td>
-<td>Quarto, Markdown</td>
+<td><strong>Automation</strong></td>
+<td>Bash scripting</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="one-command-setup" class="slide level2">
-<h2>🚀 One-Command Setup</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href=""></a><span class="ex">./setup.sh</span> full</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Automatically: 1. ✅ Installs dependencies (Python + R) 2. ✅ Fetches live flight data 3. ✅ Trains ML model 4. ✅ Generates analytics report</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href=""></a><span class="ex">./setup.sh</span> dashboard  <span class="co"># Launch interactive app</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<aside class="notes">
-<p>Emphasize the polish and production-readiness</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
+<section id="key-achievements" class="slide level2">
+<h2>🏆 Key Achievements</h2>
+<p>✅ <strong>Real API Integration</strong> - Live aviation data, not mock data</p>
+<p>✅ <strong>Production ML</strong> - Validation, tuning, residual analysis</p>
+<p>✅ <strong>Multi-source Merging</strong> - Flights + weather with temporal precision</p>
+<p>✅ <strong>Interactive Dashboards</strong> - Responsive visualizations for exploration</p>
+<p>✅ <strong>Comprehensive Analysis</strong> - 50+ page report with deep insights</p>
 </section>
-<section id="key-learnings" class="slide level2">
-<h2>💡 Key Learnings</h2>
+<section id="technical-highlights" class="slide level2">
+<h2>💡 Technical Highlights</h2>
 <ul>
-<li class="fragment"><strong>Data is everything</strong> - quality data + multiple sources = better insights</li>
-<li class="fragment"><strong>Real-time matters</strong> - live API data beats static datasets</li>
-<li class="fragment"><strong>ML needs context</strong> - temporal patterns crucial for flight delays</li>
-<li class="fragment"><strong>Visualization tells stories</strong> - interactive dashboards engage audiences</li>
-<li class="fragment"><strong>Automation scales</strong> - bash scripts make reproduction easy</li>
+<li><strong>Pagination handling</strong> for 1000+ API results</li>
+<li><strong>Rate limiting</strong> with intelligent retry logic</li>
+<li><strong>Feature engineering</strong> from temporal data</li>
+<li><strong>Cross-validation</strong> for robust evaluation</li>
+<li><strong>Responsive design</strong> that works on any device</li>
 </ul>
 </section>
-<section id="future-enhancements" class="slide level2">
-<h2>🎯 Future Enhancements</h2>
-<ol type="1">
-<li class="fragment"><strong>More airlines</strong> - Expand to international carriers</li>
-<li class="fragment"><strong>Deeper forecasting</strong> - 24-hour predictions</li>
-<li class="fragment"><strong>Mobile app</strong> - React Native dashboard</li>
-<li class="fragment"><strong>Real alerts</strong> - Notify users of predicted delays</li>
-<li class="fragment"><strong>Multi-metric</strong> - Include costs, cancellation risk</li>
-<li class="fragment"><strong>A/B testing</strong> - Validate prediction accuracy</li>
-</ol>
+<section id="impact" class="slide level2">
+<h2>🚀 Impact</h2>
+<p>This system enables: - ✈️ Airlines to <strong>identify delay patterns</strong> - 📊 Data-driven <strong>operational decisions</strong> - 🎯 <strong>Accurate predictions</strong> for customer communication - 💰 <strong>Cost reduction</strong> through optimization</p>
+</section>
+<section id="whats-next" class="slide level2">
+<h2>🎯 What’s Next</h2>
+<ul>
+<li>Expand to <strong>international carriers</strong></li>
+<li><strong>24-hour delay forecasts</strong></li>
+<li><strong>Real-time alerts</strong> for predictions</li>
+<li><strong>Mobile application</strong></li>
+<li><strong>Multi-metric predictions</strong> (cancellation risk, costs)</li>
+</ul>
 </section>
 <section id="thank-you" class="slide level2">
-<h2>🙏 Thank You</h2>
-<p><strong>See it in action:</strong> - Dashboard: <code>./setup.sh dashboard</code> - Report: <code>analysis.html</code> - Code: GitHub (public repo)</p>
+<h2>Thank You ✈️</h2>
+<p><strong>See it live:</strong> - Dashboard visualization - Interactive predictions - Analytics insights</p>
 <p><strong>Questions?</strong></p>
-<aside class="notes">
-<p>Strong close - give them a way to see it live</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="technical-appendix" class="slide level2 smaller">
-<h2>📚 Technical Appendix</h2>
-<h3 id="data-pipeline-stats">Data Pipeline Stats</h3>
-<ul>
-<li class="fragment"><strong>Flights fetched:</strong> 897 (live + 7-day history)</li>
-<li class="fragment"><strong>Weather match:</strong> 97.9% success rate</li>
-<li class="fragment"><strong>Data points:</strong> 800+ with complete features</li>
-<li class="fragment"><strong>Time range:</strong> Last 7 days + real-time</li>
-</ul>
-<h3 id="model-specifications">Model Specifications</h3>
-<ul>
-<li class="fragment"><strong>Algorithm:</strong> Random Forest (ranger)</li>
-<li class="fragment"><strong>Features:</strong> 20+ engineered features</li>
-<li class="fragment"><strong>Target:</strong> Departure delay (minutes)</li>
-<li class="fragment"><strong>Training/Test:</strong> 637/160 split</li>
-<li class="fragment"><strong>CV:</strong> 5-fold cross-validation</li>
-<li class="fragment"><strong>Performance:</strong> RMSE 8.4 min, MAE 6.2 min</li>
-</ul>
-<h3 id="deployment">Deployment</h3>
-<ul>
-<li class="fragment">Python venv for data pipeline</li>
-<li class="fragment">R packages: 8 core dependencies</li>
-<li class="fragment">Total setup time: ~5 minutes</li>
-<li class="fragment">Runs on macOS/Linux</li>
-</ul>
 
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
-<p>Airline Performance Dashboard</p>
+<p>✈️ Airline Performance Dashboard</p>
 </div>
 </div></div>
 
@@ -589,7 +329,6 @@ Sabuhi Abbasov
   <script src="presentation_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="presentation_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
@@ -605,14 +344,13 @@ Sabuhi Abbasov
       // https://revealjs.com/config/
       Reveal.initialize({
 'controlsAuto': true,
-'previewLinksAuto': false,
+'previewLinksAuto': true,
 'pdfSeparateFragments': false,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
-'chalkboard': {"buttons":true},
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -758,9 +496,9 @@ Sabuhi Abbasov
         // The "normal" size of the presentation, aspect ratio will be preserved
         // when the presentation is scaled to fit different resolutions. Can be
         // specified using percentage units.
-        width: 1050,
+        width: 1200,
 
-        height: 700,
+        height: 675,
 
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
@@ -783,7 +521,7 @@ Sabuhi Abbasov
         },
 
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
 
           RevealMath,
           RevealNotes,
@@ -792,44 +530,6 @@ Sabuhi Abbasov
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        // dispatch for htmlwidgets
-        function fireSlideEnter() {
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-        }
-
-        function fireSlideChanged(previousSlide, currentSlide) {
-          fireSlideEnter();
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
       window.document.addEventListener("DOMContentLoaded", function (event) {
         const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
