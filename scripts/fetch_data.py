@@ -15,7 +15,10 @@ CLEANED_DIR.mkdir(parents=True, exist_ok=True)
 API_KEY = "285122daf0a57d6e80a80ed9d132b1da"
 BASE_URL = "https://api.aviationstack.com/v1"
 
+# Enable/Disable API fetching globally
 FETCH_FROM_API = False
+# Enable API fetching for historical flights with real delay data for ML training
+FETCH_HISTORICAL_FLIGHTS = True
 
 ENDPOINTS = {
     "flights": "flights",
@@ -65,9 +68,48 @@ def fetch_or_load(endpoint_name, paginate=False):
     return data
 
 airports_data = fetch_or_load("airports", paginate=True)
+
+# Turn ON API fetching for live flights data
+FETCH_FROM_API = True
 flights_data = fetch_or_load("flights")
+# Turn OFF API fetching after flights
+FETCH_FROM_API = False
+
 cities_data = fetch_or_load("cities")
 countries_data = fetch_or_load("countries")
+
+# Fetch historical flights with real delays for ML training
+if FETCH_HISTORICAL_FLIGHTS:
+    print("Fetching historical flights data for ML training...")
+    historical_flights = []
+    
+    # Fetch last 7 days of historical data for training (aviationstack provides 3 months)
+    for days_back in range(1, 8):
+        flight_date = (datetime.date.today() - datetime.timedelta(days=days_back)).strftime('%Y-%m-%d')
+        
+        params = {
+            "access_key": API_KEY,
+            "flight_date": flight_date,
+            "limit": 100,
+            "offset": 0
+        }
+        
+        print(f"  > Fetching flights for {flight_date}...")
+        
+        try:
+            response = requests.get(f"{BASE_URL}/flights", params=params, timeout=(5, 15))
+            response.raise_for_status()
+            res_json = response.json()
+            batch = res_json.get("data", [])
+            historical_flights.extend(batch)
+            time.sleep(1)  # Rate limiting
+        except Exception as e:
+            print(f"  ! Error fetching {flight_date}: {e}")
+    
+    if historical_flights:
+        flights_data["data"].extend(historical_flights)
+        print(f"  ✓ Total flights collected: {len(flights_data['data'])}")
+
 
 airports_df = pd.DataFrame(airports_data["data"])
 airports_df = airports_df.drop_duplicates(subset=["iata_code"])
@@ -76,6 +118,10 @@ airports_df = airports_df[airports_df["latitude"] != 0]
 airports_lookup = airports_df.set_index("iata_code")[["latitude", "longitude"]]
 
 flights = pd.json_normalize(flights_data["data"], sep='_')
+
+# Extract actual delay times from API response (real delays for completed/landed flights)
+flights["departure_delay"] = pd.to_numeric(flights.get("departure_delay", 0), errors='coerce').fillna(0)
+flights["arrival_delay"] = pd.to_numeric(flights.get("arrival_delay", 0), errors='coerce').fillna(0)
 
 flights["departure_estimated"] = pd.to_datetime(flights["departure_estimated"], utc=True)
 flights["flight_date_str"] = pd.to_datetime(flights["flight_date"]).dt.strftime('%Y-%m-%d')
