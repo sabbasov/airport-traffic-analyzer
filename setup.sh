@@ -72,8 +72,13 @@ launch_dashboard() {
 generate_report() {
   echo ""
   echo "Generating analytics report..."
-  quarto render analysis.qmd --to html
-  echo "✓ Report generated: analysis.html"
+  if command -v quarto &> /dev/null; then
+    quarto render analysis.qmd --to html
+    echo "✓ Report generated: analysis.html"
+  else
+    echo "⚠ quarto not found. Install with: brew install quarto"
+    echo "  Or visit: https://quarto.org/docs/get-started/"
+  fi
 }
 
 show_help() {

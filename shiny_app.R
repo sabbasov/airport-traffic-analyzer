@@ -219,8 +219,11 @@ server <- function(input, output) {
   output$wind_scatter <- renderPlotly({
     data <- filtered_data() |>
       filter(!is.na(wind_speed_10m), !is.na(departure_delay), 
-             departure_delay > -100, departure_delay < 500) |>
-      sample_n(size = min(500, nrow(.)))
+             departure_delay > -100, departure_delay < 500)
+    
+    if (nrow(data) > 500) {
+      data <- slice_sample(data, n = 500)
+    }
     
     p <- ggplot(data, aes(x = wind_speed_10m, y = departure_delay)) +
       geom_point(alpha = 0.5, color = "#3498db") +

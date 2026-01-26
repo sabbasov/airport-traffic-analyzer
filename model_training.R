@@ -20,17 +20,16 @@ flights_data <- flights_data |>
     arrival_iata,
     hour_of_day,
     day_of_week,
-    wind_speed_10m,
-    aircraft
+    wind_speed_10m
   )
 
 set.seed(42)
 data_split <- initial_split(flights_data, prop = 0.8)
 train_data <- training(data_split)
 test_data <- testing(data_split)
+test_data_original <- test_data
 
 recipe_spec <- recipe(departure_delay ~ ., data = train_data) |>
-  step_remove(aircraft) |>
   step_dummy(all_nominal_predictors(), one_hot = TRUE) |>
   step_normalize(all_numeric_predictors()) |>
   step_impute_mean(wind_speed_10m)
@@ -40,7 +39,7 @@ model_spec_rf <- rand_forest(
   min_n = tune(),
   trees = 500
 ) |>
-  set_engine("ranger") |>
+  set_engine("ranger", importance = "impurity") |>
   set_mode("regression")
 
 model_spec_lm <- linear_reg() |>
@@ -62,9 +61,11 @@ fit_lm <- fit(workflow_lm, data = train_data)
 pred_lm <- predict(fit_lm, test_data) |>
   bind_cols(test_data |> select(departure_delay))
 
-rmse_lm <- sqrt(mean((pred_lm$.pred - pred_lm$departure_delay)^2))
-mae_lm <- mean(abs(pred_lm$.pred - pred_lm$departure_delay))
-r2_lm <- 1 - sum((pred_lm$.pred - pred_lm$departure_delay)^2) / sum((pred_lm$departure_delay - mean(pred_lm$departure_delay))^2)
+rmse_lm <- sqrt(mean((pred_lm$.pred - pred_lm$departure_delay)^2, na.rm = TRUE))
+mae_lm <- mean(abs(pred_lm$.pred - pred_lm$departure_delay), na.rm = TRUE)
+ss_res <- sum((pred_lm$.pred - pred_lm$departure_delay)^2, na.rm = TRUE)
+ss_tot <- sum((pred_lm$departure_delay - mean(pred_lm$departure_delay, na.rm = TRUE))^2, na.rm = TRUE)
+r2_lm <- if (ss_tot > 0) 1 - (ss_res / ss_tot) else NA
 
 cat("Linear Regression Model Performance:\n")
 cat("RMSE:", round(rmse_lm, 2), "minutes\n")
@@ -87,16 +88,18 @@ fit_rf <- fit(workflow_rf_final, data = train_data)
 pred_rf <- predict(fit_rf, test_data) |>
   bind_cols(test_data |> select(departure_delay))
 
-rmse_rf <- sqrt(mean((pred_rf$.pred - pred_rf$departure_delay)^2))
-mae_rf <- mean(abs(pred_rf$.pred - pred_rf$departure_delay))
-r2_rf <- 1 - sum((pred_rf$.pred - pred_rf$departure_delay)^2) / sum((pred_rf$departure_delay - mean(pred_rf$departure_delay))^2)
+rmse_rf <- sqrt(mean((pred_rf$.pred - pred_rf$departure_delay)^2, na.rm = TRUE))
+mae_rf <- mean(abs(pred_rf$.pred - pred_rf$departure_delay), na.rm = TRUE)
+ss_res_rf <- sum((pred_rf$.pred - pred_rf$departure_delay)^2, na.rm = TRUE)
+ss_tot_rf <- sum((pred_rf$departure_delay - mean(pred_rf$departure_delay, na.rm = TRUE))^2, na.rm = TRUE)
+r2_rf <- if (ss_tot_rf > 0) 1 - (ss_res_rf / ss_tot_rf) else NA
 
 cat("\nRandom Forest Model Performance:\n")
 cat("RMSE:", round(rmse_rf, 2), "minutes\n")
 cat("MAE:", round(mae_rf, 2), "minutes\n")
 cat("R² Score:", round(r2_rf, 4), "\n\n")
 
-if (rmse_rf < rmse_lm) {
+if (!is.na(rmse_rf) && !is.na(rmse_lm) && rmse_rf < rmse_lm) {
   final_model <- fit_rf
   final_rmse <- rmse_rf
   model_type <- "Random Forest"
@@ -124,6 +127,7 @@ prediction_df <- bind_rows(
 
 residuals_by_airline <- prediction_df |>
   filter(model == model_type) |>
+  bind_cols(test_data_original |> select(airline_name)) |>
   mutate(residual = .pred - departure_delay) |>
   group_by(airline_name) |>
   summarise(
@@ -139,6 +143,7 @@ print(residuals_by_airline |> slice_head(n = 10))
 
 residuals_by_hour <- prediction_df |>
   filter(model == model_type) |>
+  bind_cols(test_data_original |> select(hour_of_day)) |>
   mutate(residual = .pred - departure_delay) |>
   group_by(hour_of_day) |>
   summarise(
