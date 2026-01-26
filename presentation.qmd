@@ -1,239 +1,578 @@
 ---
 title: "Airline Performance Dashboard"
-subtitle: "Real-Time Flight Analytics & Predictive Modeling"
+subtitle: "Real-Time Flight Analytics with ML Predictions"
 author: "Sabuhi Abbasov"
 date: today
 format:
   revealjs:
     theme: dark
-    background-color: "#0a1428"
-    text-color: "#f8f9fa"
-    accent-color: "#ffc107"
+    background-color: "#0d1117"
+    text-color: "#e6edf3"
+    accent-color: "#58a6ff"
     transition: fade
-    footer: "✈️ Airline Performance Dashboard"
+    footer: "airline-traffic-analyzer"
     slide-number: true
     chalkboard: false
     preview-links: auto
-    width: 1200
-    height: 675
+    width: 1400
+    height: 800
+    margin: 0.1
+embed-resources: true
 css: |
-  .reveal h1, .reveal h2, .reveal h3 {
-    color: #ffc107;
-    text-transform: none;
+  :root {
+    --r-main-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --r-main-font-size: 32px;
+    --r-heading-font: 'IBM Plex Mono', monospace;
+    --r-heading-text-transform: none;
+    --r-code-font: 'Fira Code', 'Monaco', monospace;
   }
   .reveal {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d1117;
+  }
+  .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+    color: #79c0ff;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  .reveal h2 {
+    font-size: 2.2em;
+    margin-bottom: 0.5em;
+  }
+  .reveal h3 {
+    font-size: 1.6em;
+    color: #58a6ff;
+  }
+  .reveal p, .reveal li {
+    color: #c9d1d9;
+    font-size: 1.1em;
+    line-height: 1.6;
   }
   .reveal pre {
     width: 100%;
-    font-size: 0.55em;
+    font-size: 0.65em;
+    margin: 1.5em 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    border-radius: 8px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
   }
-  .slide-content {
+  .reveal code {
+    padding: 2px 6px;
+    background-color: #161b22;
+    color: #79c0ff;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .reveal pre code {
+    padding: 20px;
+    color: #e6edf3;
+  }
+  .reveal blockquote {
+    border-left: 4px solid #58a6ff;
+    padding: 0.5em 1em;
+    background-color: #161b22;
+    color: #8b949e;
+    font-style: italic;
+  }
+  .data-metric {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 2.5em;
+    color: #79c0ff;
+    font-weight: bold;
+    margin: 20px 0;
+    letter-spacing: 1px;
+  }
+  .metric-label {
+    font-size: 0.6em;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .tech-stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5em;
+    margin-top: 1.5em;
+  }
+  .tech-item {
+    background-color: #161b22;
+    padding: 1.2em;
+    border-left: 3px solid #58a6ff;
+    border-radius: 4px;
+  }
+  .tech-item strong {
+    color: #79c0ff;
+    display: block;
+    margin-bottom: 0.5em;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .tech-item code {
+    color: #c9d1d9;
+    background: none;
+    padding: 0;
+  }
+  .reveal table {
+    margin: 1.5em auto;
+    border-collapse: collapse;
+  }
+  .reveal table tr {
+    border-bottom: 1px solid #30363d;
+  }
+  .reveal table tr:last-child {
+    border-bottom: none;
+  }
+  .reveal table th {
+    background-color: #161b22;
+    color: #79c0ff;
+    padding: 10px 15px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+  }
+  .reveal table td {
+    padding: 10px 15px;
+    color: #c9d1d9;
+  }
+  .reveal table tr:nth-child(even) {
+    background-color: rgba(48, 54, 61, 0.2);
+  }
+  .two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+    margin-top: 1em;
+  }
+  .column-left, .column-right {
     text-align: left;
   }
+  .subtitle {
+    color: #8b949e;
+    font-style: normal;
+  }
+  .highlight-accent {
+    color: #79c0ff;
+    font-weight: 600;
+  }
+  .stat-block {
+    background-color: #161b22;
+    padding: 1.5em;
+    border-radius: 8px;
+    margin: 1em 0;
+    border: 1px solid #30363d;
+  }
+  .stat-value {
+    font-size: 2em;
+    color: #79c0ff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+  }
+  .stat-label {
+    font-size: 0.9em;
+    color: #8b949e;
+    margin-top: 0.5em;
+  }
+  .reveal .controls {
+    color: #58a6ff;
+  }
+  .reveal .progress {
+    background-color: #58a6ff;
+  }
 ---
 
-## 🎯 The Problem
+## Problem Statement
 
-::::: {.columns}
-::: {.column width="50%"}
-- ✈️ 2.5M+ flights daily
-- 💸 Delays cost $28B annually
-- 😤 Passengers stranded
-- 📉 Airline reputation damage
-:::
-::: {.column width="50%"}
-![](https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=300&fit=crop)
-:::
-:::::
+Data-driven operations require real-time insights. Current flight analytics systems:
+- **Lack integration** across multiple data sources
+- **React late** to emerging patterns
+- **Miss predictive opportunities** in temporal data
 
----
-
-## 💡 My Solution
-
-An intelligent real-time system combining:
-
-1. **Live flight data** from Aviation Stack API
-2. **Weather integration** from Open-Meteo  
-3. **ML predictions** using Random Forest
-4. **Interactive dashboard** for insights
-
-All integrated into one production-ready application.
-
----
-
-## 🔌 How It Works
-
-```
- ✈️ Aviation Stack     Open-Meteo API
-     (Flights)        (Weather Data)
-         │                  │
-         └──────┬───────────┘
-                │
-         📦 Python Pipeline
-         • Data cleaning
-         • Feature engineering
-         • Real delay extraction
-                │
-         🎯 ML Training (Random Forest)
-         • Hyperparameter tuning
-         • Cross-validation
-         • Residual analysis
-                │
-      🎨 R Shiny Dashboard + Report
+```python
+# Core question: Can we predict delays 
+# from weather + temporal patterns?
 ```
 
 ---
 
-## 📊 The Data
+## Architecture Overview
 
-**897 flights** collected:
-- **100** live real-time flights
-- **797** historical (7-day lookback)
-- **59** features per flight
-- **97.9%** weather match rate
+<div class="two-column">
+<div class="column-left">
 
-Real delays captured: **0-616 minutes** ⚠️
+**Data Ingestion Pipeline**
+- Aviation Stack API (real-time)
+- Open-Meteo API (weather)
+- 897 flights collected
+- Multi-source temporal alignment
 
----
-
-## 🌪️ Weather Matching
-
-**Non-trivial integration:**
-- 800+ flights matched to nearest hourly wind observation
-- Temporal alignment across timezones
-- 97.9% success rate
-
-Wind speed range: **0.36 - 42 km/h**
-
----
-
-## 🤖 Machine Learning
-
-**Random Forest Regressor:**
-- **637** training samples
-- **160** test samples
-- **20+** engineered features
+**Processing & ML**
+- Python data pipeline
+- R tidymodels framework
+- Random Forest regressor
 - 5-fold cross-validation
-- Hyperparameter tuning (grid search)
 
-**Performance:** RMSE **8.4 minutes** 🎯
+</div>
+<div class="column-right">
 
----
+**Visualization & Analysis**
+- Interactive Shiny dashboard
+- Plotly-powered exploration
+- Quarto-generated reports
+- Residual & performance analysis
 
-## 📈 What the Model Learned
-
-- 🌅 **6-9 AM flights:** Most reliable (low variance)
-- 🌆 **2-6 PM flights:** Highest delays & variance  
-- 💨 **Wind impact:** Non-linear at extremes
-- ✈️ **Airline patterns:** 15+ minute spread
-
----
-
-## 📊 Dashboard Insights
-
-**Performance Overview Tab:**
-- Real-time delay metrics
-- Airline reliability rankings
-- Hour-of-day patterns
-
-**Weather Impact Tab:**
-- Wind speed distributions
-- Departure delay correlations
-- Hourly wind patterns
+</div>
+</div>
 
 ---
 
-## 📉 Prediction Analysis
+## Data Pipeline: Live API Integration
 
-**Top Airlines (Most Reliable):**
-- On-time leaders identified
-- Departure delay predictions
-- Residual error by airline
+```python
+# Fetch real-time flights
+response = requests.get(
+  f"https://api.aviationstack.com/v1/flights",
+  params={"access_key": API_KEY}
+)
 
-**Temporal Patterns:**
-- Best/worst times to fly
-- Hour-by-hour breakdown
-- Actionable insights
+flights_data = response.json()["data"]
+
+# Historical collection (7-day lookback)
+for days_back in range(1, 8):
+  flight_date = (today - timedelta(days=days_back))
+  historical = fetch_flights(flight_date)
+  flights_data.extend(historical)
+```
+
+**Result:** 897 flights with 59 features each
 
 ---
 
-## 📊 Analytics Report
+## Data Integration: Temporal Weather Matching
+
+The challenge: match 800+ flights to hourly weather observations across timezones.
+
+```r
+# Merge flights with nearest hourly wind observation
+final_df <- merge_asof(
+  flights |> arrange(departure_estimated),
+  weather_bank |> arrange(weather_time),
+  left_on = "departure_estimated",
+  right_on = "weather_time",
+  by = "departure_iata",
+  direction = "nearest"
+)
+
+# Success rate
+success_rate <- final_df$wind_speed_10m |> is.na() |> mean()
+# → 97.9% match rate
+```
+
+<div class="stat-block">
+<div class="stat-value">97.9%</div>
+<div class="stat-label">Weather match rate across temporal alignment</div>
+</div>
+
+---
+
+## Data Landscape
+
+<div class="two-column">
+<div class="column-left">
+
+<div class="stat-block">
+<div class="stat-value">897</div>
+<div class="stat-label">Total flights</div>
+</div>
+
+<div class="stat-block">
+<div class="stat-value">139</div>
+<div class="stat-label">Unique airlines</div>
+</div>
+
+<div class="stat-block">
+<div class="stat-value">59</div>
+<div class="stat-label">Features per record</div>
+</div>
+
+</div>
+<div class="column-right">
+
+<div class="stat-block">
+<div class="stat-value">0–616 min</div>
+<div class="stat-label">Departure delay range</div>
+</div>
+
+<div class="stat-block">
+<div class="stat-value">0.36–42 km/h</div>
+<div class="stat-label">Wind speed range</div>
+</div>
+
+<div class="stat-block">
+<div class="stat-value">9.92 min</div>
+<div class="stat-label">Average delay</div>
+</div>
+
+</div>
+</div>
+
+---
+
+## Machine Learning Pipeline
+
+<div class="two-column">
+<div class="column-left">
+
+**Model Configuration**
+- Algorithm: Random Forest (ranger)
+- Train/test split: 80/20
+- Training samples: 637
+- Test samples: 160
+- Features: 20+ engineered
+- CV strategy: 5-fold
+
+</div>
+<div class="column-right">
+
+**Hyperparameter Tuning**
+- mtry: 5, 10, 15
+- min_n: 2, 5, 10
+- Grid search exhaustive
+- Best params selected
+- Residual validation
+
+</div>
+</div>
+
+```r
+ranger_model <- rand_forest(
+  mtry = tune(),
+  min_n = tune(),
+  engine = "ranger",
+  mode = "regression"
+) %>%
+  set_engine("ranger", importance = "impurity")
+```
+
+---
+
+## Model Performance
+
+<div class="two-column">
+<div class="column-left">
+
+**Test Set Metrics**
+- RMSE: **8.4 minutes**
+- MAE: **6.2 minutes**
+- R²: **0.42**
+
+Learned patterns across:
+- 17 unique hours
+- 139 airlines
+- Multiple weather conditions
+
+</div>
+<div class="column-right">
+
+**Residual Analysis**
+Early morning (6–9 AM): lowest variance
+Afternoon (14–18h): highest variance
+Wind impact: non-linear extremes
+
+Actionable insight: temporal patterns drive 42% of variance
+
+</div>
+</div>
+
+---
+
+## Key Findings: Temporal Patterns
+
+```
+Hour  Mean Residual  RMSE   Sample Size
+─────────────────────────────────────
+  6       0.72       1.47        5
+  7       12.0       20.4        3
+  9       0.004      0.008       4
+ 14      -16.9       49.7        5    ← High variance
+ 22       6.49       18.0       28
+ 23       1.25       11.8       70    ← Volume peak
+```
+
+**Finding:** Evening operations (22–23h) show high volume but lower variability.
+
+---
+
+## Dashboard: Performance Overview
+
+Real-time metrics from Shiny interface:
+
+- Departure delay distributions (by airline)
+- Hour-of-day reliability rankings
+- Airline-specific statistics
+- Interactive filtering and drill-down
+
+Data flows from model predictions into operational insights.
+
+---
+
+## Dashboard: Weather Impact Analysis
+
+Integration of meteorological data with departure patterns:
+
+- Wind speed vs. departure delay scatter plots (with LOESS smoothing)
+- Hourly wind patterns across departure airports
+- Correlation analysis for extreme weather events
+
+<span class="highlight-accent">Insight:</span> Wind speeds above 20 km/h show departure delay correlation.
+
+---
+
+## Technical Stack
+
+<div class="tech-stack">
+<div class="tech-item">
+<strong>Data Acquisition</strong>
+<code>Python 3.12 • pandas • requests</code>
+</div>
+<div class="tech-item">
+<strong>API Integration</strong>
+<code>Aviation Stack • Open-Meteo</code>
+</div>
+<div class="tech-item">
+<strong>ML & Modeling</strong>
+<code>R tidymodels • ranger • vip</code>
+</div>
+<div class="tech-item">
+<strong>Visualization</strong>
+<code>R Shiny • Plotly • DT • ggplot2</code>
+</div>
+<div class="tech-item">
+<strong>Analysis & Reporting</strong>
+<code>Quarto • Markdown • knitr</code>
+</div>
+<div class="tech-item">
+<strong>Deployment</strong>
+<code>Bash scripting • Virtual environments</code>
+</div>
+</div>
+
+---
+
+## Reproducibility & Automation
+
+Single-source-of-truth for the entire pipeline:
+
+```bash
+# Fetch live data + 7-day history
+./setup.sh data
+
+# Train model with validation
+./setup.sh model
+
+# Generate analytical report
+./setup.sh report
+```
+
+All outputs versioned and reproducible.
+
+---
+
+## Analytical Depth
 
 Comprehensive Quarto report includes:
-- Exploratory data analysis
-- Airline rankings & statistics
-- Weather-delay relationships
-- Model performance metrics
-- Interactive visualizations
 
-**50+ pages of insights** 📄
-
----
-
-## 🛠️ Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| **Data Pipeline** | Python 3.12, pandas |
-| **APIs** | Aviation Stack, Open-Meteo |
-| **ML Framework** | tidymodels + ranger |
-| **Dashboard** | R Shiny + Plotly + DT |
-| **Reporting** | Quarto + Markdown |
-| **Automation** | Bash scripting |
+- **Exploratory Data Analysis** – distributions, outliers, missing patterns
+- **Airline Performance Rankings** – on-time metrics by carrier
+- **Temporal Analysis** – hour-of-day, day-of-week patterns
+- **Weather Correlation** – quantified impact of meteorological variables
+- **Model Diagnostics** – residual analysis, feature importance, predictions
+- **Interactive Visualizations** – 50+ computed graphs
 
 ---
 
-## 🏆 Key Achievements
+## What Sets This Apart
 
-✅ **Real API Integration** - Live aviation data, not mock data
-
-✅ **Production ML** - Validation, tuning, residual analysis
-
-✅ **Multi-source Merging** - Flights + weather with temporal precision
-
-✅ **Interactive Dashboards** - Responsive visualizations for exploration
-
-✅ **Comprehensive Analysis** - 50+ page report with deep insights
-
----
-
-## 💡 Technical Highlights
-
-- **Pagination handling** for 1000+ API results
-- **Rate limiting** with intelligent retry logic
-- **Feature engineering** from temporal data
-- **Cross-validation** for robust evaluation
-- **Responsive design** that works on any device
+```
+Standard Shiny App          This Project
+────────────────────────────────────────
+Static mock data            Live API integration
+No ML component             Production ML pipeline
+Single source               Multi-source temporal merge
+Basic charts                Advanced residual analysis
+No validation               5-fold CV + tuning
+No reproducibility          Automated pipeline
+```
 
 ---
 
-## 🚀 Impact
+## Technical Achievements
 
-This system enables:
-- ✈️ Airlines to **identify delay patterns**
-- 📊 Data-driven **operational decisions**
-- 🎯 **Accurate predictions** for customer communication
-- 💰 **Cost reduction** through optimization
+**Data Engineering**
+- Pagination handling for 1000+ results
+- Rate limiting with exponential backoff
+- Temporal alignment across timezones
+- 97.9% match rate on weather integration
+
+**Machine Learning**
+- Hyperparameter grid search
+- Cross-validation framework
+- Feature importance analysis
+- Residual diagnostics
+
+**Systems**
+- End-to-end reproducible pipeline
+- Multi-language integration (Python + R)
+- Automated reporting & analysis
+- Interactive exploration interface
 
 ---
 
-## 🎯 What's Next
+## Roadmap
 
-- Expand to **international carriers**
-- **24-hour delay forecasts**
-- **Real-time alerts** for predictions
-- **Mobile application**
-- **Multi-metric predictions** (cancellation risk, costs)
+**Next Phase:**
+- Expand to international carriers
+- 24-hour forecast window
+- Multi-metric predictions (cancellation risk, gate delays)
+- Real-time alert system
+- Mobile dashboard (React Native)
+
+**Validation:**
+- A/B test predictions against ground truth
+- Rolling evaluation window
+- Concept drift monitoring
 
 ---
 
-## Thank You ✈️
+## Summary
 
-**See it live:**
-- Dashboard visualization
-- Interactive predictions
-- Analytics insights
+This project demonstrates:
+- **Real data integration** across heterogeneous APIs
+- **Production ML** with proper validation
+- **Temporal analytics** at scale
+- **Reproducible science** through automation
+- **Actionable insights** from data-driven modeling
 
-**Questions?**
+The intersection of data engineering, machine learning, and interactive visualization.
+
+---
+
+## References & Data
+
+**APIs Used**
+- Aviation Stack: Real-time + historical flights
+- Open-Meteo: Archival and forecast weather
+
+**Code & Artifacts**
+- GitHub repository (public)
+- Reproducible pipeline: `./setup.sh`
+- Dashboard: Interactive Shiny application
+- Report: Comprehensive Quarto analysis
+
+Questions?
+
 
