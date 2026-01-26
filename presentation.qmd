@@ -1,6 +1,6 @@
 ---
-title: "AIRLINE PERFORMANCE DASHBOARD"
-subtitle: "REAL-TIME ANALYTICS // ML PREDICTIONS"
+title: "Airline Performance Dashboard"
+subtitle: "Delay Prediction System"
 author: "Sabuhi Abbasov"
 date: today
 format:
