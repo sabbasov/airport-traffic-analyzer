@@ -248,7 +248,7 @@ server <- function(input, output) {
       )
     
     p <- ggplot(data, aes(x = hour_of_day, y = avg_wind)) +
-      geom_line(color = "#9b59b6", size = 1) +
+      geom_line(color = "#9b59b6", linewidth = 1) +
       geom_point(color = "#9b59b6", size = 2) +
       theme_minimal() +
       theme(plot.title = element_text(face = "bold")) +
