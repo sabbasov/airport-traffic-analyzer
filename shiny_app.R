@@ -31,13 +31,7 @@ ui <- fluidPage(
         selected = "All Airlines"
       ),
       
-      selectInput(
-        "metric_type",
-        "Select Metric:",
-        choices = c("Departure Delay", "Wind Speed", "Flight Count"),
-        selected = "Departure Delay"
-      ),
-      
+
       sliderInput(
         "hour_filter",
         "Hour of Day Range:",
