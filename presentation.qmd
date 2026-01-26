@@ -281,18 +281,14 @@ ggplotly(p, tooltip = c("x", "y"))
 ## Weather-Delay Relationship
 
 ```{r wind-vs-delay, echo=FALSE, fig.height=6.5, fig.width=9}
-wind_delay_sample <- flights_data %>%
-  filter(!is.na(wind_speed_10m), !is.na(departure_delay))
+wind_delay_full <- flights_data %>%
+  filter(!is.na(wind_speed_10m), !is.na(departure_delay),
+         departure_delay > -100, departure_delay < 500)
 
-if (nrow(wind_delay_sample) > 400) {
-  wind_delay_sample <- slice_sample(wind_delay_sample, n = 400)
-}
-
-p <- wind_delay_sample %>%
+p <- wind_delay_full %>%
   ggplot(aes(x = wind_speed_10m, y = departure_delay)) +
-  geom_point(alpha = 0.5, color = "#0066cc", size = 2, shape = 16) +
-  geom_smooth(aes(color = "LOESS Trend"), method = "loess", fill = "#ffebee", se = TRUE, size = 1.2) +
-  scale_color_manual(values = "#ff9800", name = "Trend") +
+  geom_hex(bins = 25, fill = "#0066cc", alpha = 0.8) +
+  scale_fill_gradient(low = "#e3f2fd", high = "#d73a49", name = "Frequency") +
   theme_minimal() +
   theme(
     plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
@@ -301,15 +297,14 @@ p <- wind_delay_sample %>%
     panel.grid.major = element_line(color = "#f0f0f0"),
     legend.position = "right",
     legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 11)
+    legend.text = element_text(size = 10)
   ) +
   labs(
-    title = "Wind Speed vs Departure Delay (400 flights sampled)",
+    title = "Wind Speed vs Departure Delay (897 flights - Density Plot)",
     x = "Wind Speed (km/h)",
-    y = "Departure Delay (minutes)",
-    color = "Pattern"
+    y = "Departure Delay (minutes)"
   )
-ggplotly(p, tooltip = c("x", "y"))
+ggplotly(p, tooltip = c("x", "y", "fill"))
 ```
 
 ---

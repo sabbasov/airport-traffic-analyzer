@@ -215,22 +215,23 @@ server <- function(input, output) {
       filter(!is.na(wind_speed_10m), !is.na(departure_delay), 
              departure_delay > -100, departure_delay < 500)
     
-    if (nrow(data) > 500) {
-      data <- slice_sample(data, n = 500)
-    }
-    
     p <- ggplot(data, aes(x = wind_speed_10m, y = departure_delay)) +
-      geom_point(alpha = 0.5, color = "#3498db") +
-      geom_smooth(method = "loess", se = TRUE, color = "#e74c3c", fill = "#ecf0f1") +
+      geom_hex(bins = 25, fill = "#3498db", alpha = 0.8) +
+      scale_fill_gradient(low = "#e3f2fd", high = "#e74c3c", name = "Count") +
       theme_minimal() +
-      theme(plot.title = element_text(face = "bold")) +
+      theme(
+        plot.title = element_text(face = "bold", size = 13),
+        axis.title = element_text(face = "bold", size = 11),
+        axis.text = element_text(size = 10),
+        legend.position = "right"
+      ) +
       labs(
         title = "Impact of Wind Speed on Departure Delays",
         x = "Wind Speed (km/h)",
         y = "Departure Delay (minutes)"
       )
     
-    ggplotly(p, tooltip = c("x", "y"))
+    ggplotly(p, tooltip = c("x", "y", "fill"))
   })
   
   output$wind_by_hour <- renderPlotly({

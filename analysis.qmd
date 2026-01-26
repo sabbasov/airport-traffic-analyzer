@@ -281,23 +281,24 @@ wind_delay_data <- flights_data |>
          departure_delay > -100, 
          departure_delay < 500)
 
-if (nrow(wind_delay_data) > 500) {
-  wind_delay_data <- wind_delay_data |> slice_sample(n = 500)
-}
-
 p <- ggplot(wind_delay_data, aes(x = wind_speed_10m, y = departure_delay)) +
-  geom_point(alpha = 0.4, color = "#3498db", size = 2) +
-  geom_smooth(method = "loess", se = TRUE, color = "#e74c3c", fill = "#ecf0f1", alpha = 0.3) +
+  geom_hex(bins = 25, fill = "#3498db", alpha = 0.8) +
+  scale_fill_gradient(low = "#e3f2fd", high = "#e74c3c", name = "Frequency") +
   theme_minimal() +
-  theme(plot.title = element_text(face = "bold", size = 14)) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.title = element_text(face = "bold", size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "right"
+  ) +
   labs(
     title = "Impact of Wind Speed on Departure Delays",
-    subtitle = "Scatter plot with LOESS smoothing",
+    subtitle = "Hexbin density plot shows data concentration (897 flights)",
     x = "Wind Speed (km/h)",
     y = "Departure Delay (minutes)"
   )
 
-ggplotly(p)
+ggplotly(p, tooltip = c("x", "y", "fill"))
 ```
 
 ### Hourly Wind Patterns
