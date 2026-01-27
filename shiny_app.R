@@ -82,7 +82,7 @@ ui <- fluidPage(
   ),
   
   div(class = "navbar-custom",
-    div(class = "navbar-title", "✈ Airline Performance Monitor"),
+    div(class = "navbar-title", "✈ Airport Traffic Analyzer"),
     div(
       actionButton("refresh_btn", "System Refresh", class = "refresh-btn"),
       br(),
