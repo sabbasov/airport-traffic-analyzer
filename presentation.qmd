@@ -57,7 +57,7 @@ format:
 
 - **Morning flights:** Minimal delays
 - **Evening flights:** Delays spike after 17:00
-- **Insight:** Booking earlier flights might seems smarter
+- **Insight:** Booking earlier flights seems smarter
 
 ---
 
