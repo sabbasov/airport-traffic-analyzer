@@ -88,6 +88,12 @@ format:
 
 ---
 
+### Day of Week Analysis
+
+![](graphs/delay_by_dayofweek.png)
+
+---
+
 ## Machine Learning Model
 
 - **Model:** Random Forest Regression (in progress)
