@@ -92,21 +92,6 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      selectInput(
-        "selected_airline",
-        "Filter by Airline:",
-        choices = c("All Airlines", airlines),
-        selected = "All Airlines"
-      ),
-      
-      sliderInput(
-        "hour_filter",
-        "Hour of Day:",
-        min = 0, max = 23, value = c(0, 23), step = 1
-      ),
-      
-      hr(),
-      
       h5("Live Metrics"),
       textOutput("total_flights"),
       textOutput("avg_delay"),
@@ -159,6 +144,24 @@ ui <- fluidPage(
         
         tabPanel(
           "Flight Details",
+          br(),
+          fluidRow(
+            column(6,
+              selectInput(
+                "selected_airline",
+                "Filter by Airline:",
+                choices = c("All Airlines", airlines),
+                selected = "All Airlines"
+              )
+            ),
+            column(6,
+              sliderInput(
+                "hour_filter",
+                "Hour of Day:",
+                min = 0, max = 23, value = c(0, 23), step = 1
+              )
+            )
+          ),
           br(),
           DTOutput("flight_table")
         )
@@ -229,7 +232,9 @@ server <- function(input, output, session) {
   })
   
   output$total_flights <- renderText({
-    paste("Total Flights:", nrow(filtered_data()))
+    # Count total flights from full dataset, not filtered
+    total <- nrow(flights_data)
+    paste("Total Flights:", total)
   })
   
   output$avg_delay <- renderText({
@@ -249,10 +254,10 @@ server <- function(input, output, session) {
   
   output$delay_distribution <- renderPlotly({
     data <- filtered_data() |>
-      filter(!is.na(departure_delay), departure_delay > -100, departure_delay < 500)
+      filter(!is.na(departure_delay), departure_delay > -10, departure_delay <= 40)
     
     p <- ggplot(data, aes(x = departure_delay, fill = "Delay")) +
-      geom_histogram(binwidth = 5, alpha = 0.7, color = "white") +
+      geom_histogram(binwidth = 2, alpha = 0.7, color = "white") +
       theme_minimal() +
       theme(
         legend.position = "none",
@@ -262,7 +267,7 @@ server <- function(input, output, session) {
         panel.grid = element_line(color = "#f0f0f0")
       ) +
       labs(
-        title = "Delay Distribution (897 Flights)",
+        title = "Delay Distribution",
         x = "Departure Delay (minutes)",
         y = "Frequency"
       )
@@ -273,12 +278,18 @@ server <- function(input, output, session) {
   
   output$hourly_pattern <- renderPlotly({
     data <- filtered_data() |>
+      filter(!is.na(departure_delay)) |>
       group_by(hour_of_day) |>
       summarise(
         avg_delay = mean(departure_delay, na.rm = TRUE),
         flight_count = n(),
         .groups = "drop"
-      )
+      ) |>
+      filter(flight_count > 0)
+    
+    # Find first and last hours with data
+    min_hour <- min(data$hour_of_day)
+    max_hour <- max(data$hour_of_day)
     
     p <- ggplot(data, aes(x = hour_of_day, y = avg_delay)) +
       geom_col(fill = "#0066cc", alpha = 0.7) +
@@ -297,7 +308,7 @@ server <- function(input, output, session) {
         y = "Average Delay (minutes)",
         size = "Flight Count"
       ) +
-      scale_x_continuous(breaks = seq(0, 23, 2))
+      scale_x_continuous(breaks = seq(floor(min_hour), ceiling(max_hour), 1), limits = c(min_hour - 0.5, max_hour + 0.5))
     
     ggplotly(p, tooltip = c("x", "y", "size")) |>
       layout(plot_bgcolor = "rgba(0,0,0,0)", paper_bgcolor = "rgba(0,0,0,0)")
@@ -344,7 +355,7 @@ server <- function(input, output, session) {
         panel.grid.major.x = element_line(color = "#f0f0f0", size = 0.3)
       ) +
       labs(
-        title = "Airlines Ranked by Delay (Focus on Problematic Carriers)",
+        title = "Airlines Ranked by Delay",
         subtitle = "Airlines with <5 min avg delay grouped as 'Other Carriers'",
         x = "Average Delay (minutes)"
       )
@@ -409,8 +420,9 @@ server <- function(input, output, session) {
     p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = avg_delay)) +
       geom_tile(color = "white", size = 0.5) +
       scale_fill_gradient2(low = "#27ae60", mid = "#f39c12", high = "#e74c3c", 
-                           midpoint = 15, name = "Avg Delay\n(min)",
-                           na.value = "#cccccc") +
+                           midpoint = 12, name = "Avg Delay\n(min)",
+                           na.value = "#cccccc",
+                           limits = c(-10, 30)) +
       scale_x_continuous(breaks = seq(0, 23, 2)) +
       theme_minimal() +
       theme(
@@ -453,12 +465,13 @@ server <- function(input, output, session) {
     
     # Generate predictions if we have data
     if (nrow(data) > 0) {
-      # Prepare data for prediction (match model features)
+      # Prepare data for prediction (match model features from training)
+      # Model was trained with: airline_name, departure_iata, arrival_iata, hour_of_day, day_of_week (numeric), wind_speed_10m
       data_for_pred <- data |>
         mutate(
-          day_of_week_numeric = as.numeric(day_of_week)
+          day_of_week = as.numeric(day_of_week)  # Convert factor to numeric
         ) |>
-        select(airline_name, departure_iata, hour_of_day, day_of_week_numeric, wind_speed_10m)
+        select(airline_name, departure_iata, arrival_iata, hour_of_day, day_of_week, wind_speed_10m)
       
       # Make predictions
       tryCatch({
@@ -466,6 +479,8 @@ server <- function(input, output, session) {
         data <- data |>
           mutate(predicted_delay = as.numeric(predicted_delays))
       }, error = function(e) {
+        # If prediction fails, log and use NA
+        message("Prediction error: ", conditionMessage(e))
         data <<- data |>
           mutate(predicted_delay = NA_real_)
       })
