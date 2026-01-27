@@ -311,6 +311,205 @@
       "flight_date": "2026-01-27",
       "flight_status": "scheduled",
       "departure": {
+        "airport": "Doha International",
+        "timezone": "Asia/Qatar",
+        "iata": "DOH",
+        "icao": "OTHH",
+        "terminal": null,
+        "gate": "D5",
+        "delay": null,
+        "scheduled": "2026-01-27T08:15:00+00:00",
+        "estimated": "2026-01-27T08:15:00+00:00",
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "arrival": {
+        "airport": "Dar Es Salam International Airport",
+        "timezone": "Africa/Dar_es_Salaam",
+        "iata": "DAR",
+        "icao": "HTDA",
+        "terminal": "3",
+        "gate": null,
+        "baggage": null,
+        "scheduled": "2026-01-27T13:50:00+00:00",
+        "delay": null,
+        "estimated": null,
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "airline": {
+        "name": "Qatar Airways",
+        "iata": "QR",
+        "icao": "QTR"
+      },
+      "flight": {
+        "number": "1476",
+        "iata": "QR1476",
+        "icao": "QTR1476",
+        "codeshared": null
+      },
+      "aircraft": null,
+      "live": null
+    },
+    {
+      "flight_date": "2026-01-27",
+      "flight_status": "active",
+      "departure": {
+        "airport": "Barajas",
+        "timezone": "Europe/Madrid",
+        "iata": "MAD",
+        "icao": "LEMD",
+        "terminal": "1",
+        "gate": "B30",
+        "delay": null,
+        "scheduled": "2026-01-27T06:15:00+00:00",
+        "estimated": "2026-01-27T06:15:00+00:00",
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "arrival": {
+        "airport": "Stansted",
+        "timezone": "Europe/London",
+        "iata": "STN",
+        "icao": "EGSS",
+        "terminal": null,
+        "gate": null,
+        "baggage": null,
+        "scheduled": "2026-01-27T07:45:00+00:00",
+        "delay": 20,
+        "estimated": null,
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "airline": {
+        "name": "Ryanair",
+        "iata": "FR",
+        "icao": "RYR"
+      },
+      "flight": {
+        "number": "348",
+        "iata": "FR348",
+        "icao": "RYR348",
+        "codeshared": null
+      },
+      "aircraft": {
+        "registration": null,
+        "iata": null,
+        "icao": null,
+        "icao24": "4CAE67"
+      },
+      "live": null
+    },
+    {
+      "flight_date": "2026-01-27",
+      "flight_status": "scheduled",
+      "departure": {
+        "airport": "Doha International",
+        "timezone": "Asia/Qatar",
+        "iata": "DOH",
+        "icao": "OTHH",
+        "terminal": null,
+        "gate": "C42",
+        "delay": null,
+        "scheduled": "2026-01-27T08:10:00+00:00",
+        "estimated": "2026-01-27T08:10:00+00:00",
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "arrival": {
+        "airport": "Novo Alexeyevka International",
+        "timezone": "Asia/Tbilisi",
+        "iata": "TBS",
+        "icao": "UGTB",
+        "terminal": null,
+        "gate": null,
+        "baggage": null,
+        "scheduled": "2026-01-27T12:35:00+00:00",
+        "delay": null,
+        "estimated": null,
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "airline": {
+        "name": "Qatar Airways",
+        "iata": "QR",
+        "icao": "QTR"
+      },
+      "flight": {
+        "number": "255",
+        "iata": "QR255",
+        "icao": "QTR255",
+        "codeshared": null
+      },
+      "aircraft": {
+        "registration": null,
+        "iata": null,
+        "icao": null,
+        "icao24": "06A092"
+      },
+      "live": null
+    },
+    {
+      "flight_date": "2026-01-27",
+      "flight_status": "active",
+      "departure": {
+        "airport": "Raja Sansi International Airport",
+        "timezone": "Asia/Kolkata",
+        "iata": "ATQ",
+        "icao": "VIAR",
+        "terminal": null,
+        "gate": null,
+        "delay": null,
+        "scheduled": "2026-01-27T10:40:00+00:00",
+        "estimated": "2026-01-27T10:40:00+00:00",
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "arrival": {
+        "airport": "Indira Gandhi International",
+        "timezone": "Asia/Kolkata",
+        "iata": "DEL",
+        "icao": "VIDP",
+        "terminal": "1",
+        "gate": null,
+        "baggage": "8",
+        "scheduled": "2026-01-27T11:55:00+00:00",
+        "delay": 10,
+        "estimated": null,
+        "actual": null,
+        "estimated_runway": null,
+        "actual_runway": null
+      },
+      "airline": {
+        "name": "IndiGo",
+        "iata": "6E",
+        "icao": "IGO"
+      },
+      "flight": {
+        "number": "6848",
+        "iata": "6E6848",
+        "icao": "IGO6848",
+        "codeshared": null
+      },
+      "aircraft": {
+        "registration": null,
+        "iata": null,
+        "icao": null,
+        "icao24": "800B12"
+      },
+      "live": null
+    },
+    {
+      "flight_date": "2026-01-27",
+      "flight_status": "scheduled",
+      "departure": {
         "airport": "Branti",
         "timezone": "Asia/Jakarta",
         "iata": "TKG",
@@ -4971,197 +5170,6 @@
         "icao": null,
         "icao24": "E80207"
       },
-      "live": null
-    },
-    {
-      "flight_date": "2026-01-27",
-      "flight_status": "scheduled",
-      "departure": {
-        "airport": "Jose Maria Cordova",
-        "timezone": "America/Bogota",
-        "iata": "MDE",
-        "icao": "SKRG",
-        "terminal": null,
-        "gate": "12B",
-        "delay": null,
-        "scheduled": "2026-01-27T06:26:00+00:00",
-        "estimated": "2026-01-27T06:26:00+00:00",
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "arrival": {
-        "airport": "Tocumen International",
-        "timezone": "America/Panama",
-        "iata": "PTY",
-        "icao": "MPTO",
-        "terminal": null,
-        "gate": "137",
-        "baggage": null,
-        "scheduled": "2026-01-27T07:49:00+00:00",
-        "delay": null,
-        "estimated": null,
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "airline": {
-        "name": "Copa Airlines",
-        "iata": "CM",
-        "icao": "CMP"
-      },
-      "flight": {
-        "number": "209",
-        "iata": "CM209",
-        "icao": "CMP209",
-        "codeshared": null
-      },
-      "aircraft": null,
-      "live": null
-    },
-    {
-      "flight_date": "2026-01-27",
-      "flight_status": "scheduled",
-      "departure": {
-        "airport": "Jose Maria Cordova",
-        "timezone": "America/Bogota",
-        "iata": "MDE",
-        "icao": "SKRG",
-        "terminal": null,
-        "gate": "4",
-        "delay": null,
-        "scheduled": "2026-01-27T06:25:00+00:00",
-        "estimated": "2026-01-27T06:25:00+00:00",
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "arrival": {
-        "airport": "El Nuevo Dorado International",
-        "timezone": "America/Bogota",
-        "iata": "BOG",
-        "icao": "SKBO",
-        "terminal": "1",
-        "gate": null,
-        "baggage": null,
-        "scheduled": "2026-01-27T07:25:00+00:00",
-        "delay": null,
-        "estimated": null,
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "airline": {
-        "name": "SA AVIANCA",
-        "iata": "AV",
-        "icao": "AVA"
-      },
-      "flight": {
-        "number": "8437",
-        "iata": "AV8437",
-        "icao": "AVA8437",
-        "codeshared": null
-      },
-      "aircraft": null,
-      "live": null
-    },
-    {
-      "flight_date": "2026-01-27",
-      "flight_status": "scheduled",
-      "departure": {
-        "airport": "Jose Maria Cordova",
-        "timezone": "America/Bogota",
-        "iata": "MDE",
-        "icao": "SKRG",
-        "terminal": null,
-        "gate": "4",
-        "delay": null,
-        "scheduled": "2026-01-27T06:25:00+00:00",
-        "estimated": "2026-01-27T06:25:00+00:00",
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "arrival": {
-        "airport": "El Nuevo Dorado International",
-        "timezone": "America/Bogota",
-        "iata": "BOG",
-        "icao": "SKBO",
-        "terminal": "1",
-        "gate": null,
-        "baggage": null,
-        "scheduled": "2026-01-27T07:25:00+00:00",
-        "delay": null,
-        "estimated": null,
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "airline": {
-        "name": "Air Canada",
-        "iata": "AC",
-        "icao": "ACA"
-      },
-      "flight": {
-        "number": "2946",
-        "iata": "AC2946",
-        "icao": "ACA2946",
-        "codeshared": {
-          "airline_name": "sa avianca",
-          "airline_iata": "av",
-          "airline_icao": "ava",
-          "flight_number": "8437",
-          "flight_iata": "av8437",
-          "flight_icao": "ava8437"
-        }
-      },
-      "aircraft": null,
-      "live": null
-    },
-    {
-      "flight_date": "2026-01-27",
-      "flight_status": "scheduled",
-      "departure": {
-        "airport": "Jose Maria Cordova",
-        "timezone": "America/Bogota",
-        "iata": "MDE",
-        "icao": "SKRG",
-        "terminal": null,
-        "gate": "1C",
-        "delay": null,
-        "scheduled": "2026-01-27T06:18:00+00:00",
-        "estimated": "2026-01-27T06:18:00+00:00",
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "arrival": {
-        "airport": "El Nuevo Dorado International",
-        "timezone": "America/Bogota",
-        "iata": "BOG",
-        "icao": "SKBO",
-        "terminal": "1",
-        "gate": null,
-        "baggage": null,
-        "scheduled": "2026-01-27T07:15:00+00:00",
-        "delay": null,
-        "estimated": null,
-        "actual": null,
-        "estimated_runway": null,
-        "actual_runway": null
-      },
-      "airline": {
-        "name": "JetSMART",
-        "iata": "JA",
-        "icao": "JAT"
-      },
-      "flight": {
-        "number": "5130",
-        "iata": "JA5130",
-        "icao": "JAT5130",
-        "codeshared": null
-      },
-      "aircraft": null,
       "live": null
     }
   ]
