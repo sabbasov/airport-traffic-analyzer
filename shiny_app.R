@@ -5,6 +5,9 @@ library(lubridate)
 library(DT)
 library(sys)
 
+# Load the trained ML model
+trained_model <- readRDS("model_training.rds")
+
 flights_data <- read_csv("data/cleaned/flights_with_weather.csv", show_col_types = FALSE)
 
 flights_data <- flights_data |>
@@ -83,7 +86,7 @@ ui <- fluidPage(
     div(
       actionButton("refresh_btn", "System Refresh", class = "refresh-btn"),
       br(),
-      textOutput("refresh_status", inline = TRUE)
+      uiOutput("refresh_status")
     )
   ),
   
@@ -205,8 +208,8 @@ server <- function(input, output, session) {
     })
   })
   
-  output$refresh_status <- renderText({
-    paste(refresh_status(), style = "color: #999; font-size: 12px;")
+  output$refresh_status <- renderUI({
+    HTML(paste0("<div style='color: #999; font-size: 12px;'>", refresh_status(), "</div>"))
   })
   
   filtered_data <- reactive({
@@ -310,9 +313,22 @@ server <- function(input, output, session) {
         .groups = "drop"
       ) |>
       filter(flight_count >= 3) |>
+      # Group airlines with <5 min avg delay into "Other Carriers"
+      mutate(
+        display_airline = case_when(
+          avg_delay < 5 ~ "Other Carriers (Reliable)",
+          TRUE ~ airline_name
+        )
+      ) |>
+      group_by(display_airline) |>
+      summarise(
+        avg_delay = mean(avg_delay, na.rm = TRUE),
+        flight_count = sum(flight_count, na.rm = TRUE),
+        .groups = "drop"
+      ) |>
       arrange(desc(avg_delay))
     
-    p <- ggplot(data, aes(x = reorder(airline_name, -avg_delay), y = avg_delay, fill = avg_delay)) +
+    p <- ggplot(data, aes(x = reorder(display_airline, -avg_delay), y = avg_delay, fill = avg_delay)) +
       geom_col(color = "white", size = 0.5) +
       scale_fill_gradient(low = "#27ae60", high = "#e74c3c", name = "Avg Delay\n(min)") +
       coord_flip() +
@@ -328,8 +344,8 @@ server <- function(input, output, session) {
         panel.grid.major.x = element_line(color = "#f0f0f0", size = 0.3)
       ) +
       labs(
-        title = "Airlines Ranked by Delay (Most to Least Delayed)",
-        subtitle = "Green = reliable, Red = problematic",
+        title = "Airlines Ranked by Delay (Focus on Problematic Carriers)",
+        subtitle = "Airlines with <5 min avg delay grouped as 'Other Carriers'",
         x = "Average Delay (minutes)"
       )
     
@@ -340,28 +356,43 @@ server <- function(input, output, session) {
   output$wind_sensitivity_index <- renderPlotly({
     data <- flights_data |>
       filter(!is.na(wind_speed_10m), !is.na(departure_delay),
-             departure_delay > -50, departure_delay < 150)
+             departure_delay > -50, departure_delay < 150) |>
+      # Aggregate wind speeds into 0.5 km/h increments
+      mutate(
+        wind_bucket = round(wind_speed_10m * 2) / 2  # Round to nearest 0.5
+      ) |>
+      group_by(wind_bucket) |>
+      summarise(
+        avg_delay = mean(departure_delay, na.rm = TRUE),
+        flight_count = n(),
+        .groups = "drop"
+      ) |>
+      filter(flight_count >= 3)  # Only keep buckets with sufficient data
     
-    p <- ggplot(data, aes(x = wind_speed_10m, y = departure_delay)) +
-      geom_point(alpha = 0.3, color = "#0066cc", size = 2) +
-      geom_smooth(method = "loess", color = "#d73a49", size = 1.2, fill = "#e3f2fd", alpha = 0.2) +
+    p <- ggplot(data, aes(x = wind_bucket, y = avg_delay)) +
+      geom_point(aes(size = flight_count), color = "#0066cc", alpha = 0.6) +
+      geom_line(color = "#d73a49", size = 1.2) +
+      geom_smooth(method = "loess", color = "#6f42c1", size = 1.2, 
+                  fill = "#e3f2fd", alpha = 0.2, se = TRUE) +
       theme_minimal() +
       theme(
         plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
         axis.title = element_text(face = "bold", size = 12),
         axis.text = element_text(size = 10),
+        legend.position = "right",
         plot.background = element_rect(fill = "transparent", color = NA),
         panel.background = element_rect(fill = "transparent", color = NA),
         panel.grid.major = element_line(color = "#f0f0f0", size = 0.3)
       ) +
       labs(
-        title = "Wind Speed vs Delay Correlation (With Trend Line)",
-        subtitle = "Red trend line shows risk threshold - expect delays beyond spike point",
-        x = "Wind Speed (km/h)",
-        y = "Departure Delay (minutes)"
+        title = "Wind Speed vs Delay Correlation (0.5 km/h Buckets)",
+        subtitle = "Red line = observed trend, Purple curve = smoothed pattern. Clear threshold visible where delays spike.",
+        x = "Wind Speed (km/h, aggregated 0.5 increments)",
+        y = "Average Departure Delay (minutes)",
+        size = "Flight Count"
       )
     
-    ggplotly(p, tooltip = c("x", "y")) |>
+    ggplotly(p, tooltip = c("x", "y", "size")) |>
       layout(plot_bgcolor = "rgba(0,0,0,0)", paper_bgcolor = "rgba(0,0,0,0)")
   })
   
@@ -402,15 +433,55 @@ server <- function(input, output, session) {
   })
   
   output$flight_table <- renderDT({
+    # Filter to only yesterday and today
+    today <- Sys.Date()
+    yesterday <- today - 1
+    
     data <- filtered_data() |>
       filter(!is.na(flight_number), flight_number != "", !is.na(airline_name)) |>
+      filter(date >= yesterday, date <= today) |>
       select(
         flight_number,
         airline_name, 
         departure_estimated,
         departure_iata, 
-        arrival_iata, 
-        departure_delay, 
+        arrival_iata,
+        wind_speed_10m,
+        hour_of_day, 
+        day_of_week
+      )
+    
+    # Generate predictions if we have data
+    if (nrow(data) > 0) {
+      # Prepare data for prediction (match model features)
+      data_for_pred <- data |>
+        mutate(
+          day_of_week_numeric = as.numeric(day_of_week)
+        ) |>
+        select(airline_name, departure_iata, hour_of_day, day_of_week_numeric, wind_speed_10m)
+      
+      # Make predictions
+      tryCatch({
+        predicted_delays <- predict(trained_model, data_for_pred)
+        data <- data |>
+          mutate(predicted_delay = as.numeric(predicted_delays))
+      }, error = function(e) {
+        data <<- data |>
+          mutate(predicted_delay = NA_real_)
+      })
+    } else {
+      data <- data |>
+        mutate(predicted_delay = NA_real_)
+    }
+    
+    data <- data |>
+      select(
+        flight_number,
+        airline_name,
+        departure_estimated,
+        departure_iata,
+        arrival_iata,
+        predicted_delay,
         wind_speed_10m
       ) |>
       rename(
@@ -419,12 +490,12 @@ server <- function(input, output, session) {
         "Departure Time" = departure_estimated,
         "From" = departure_iata,
         "To" = arrival_iata,
-        "Delay (min)" = departure_delay,
+        "Predicted Delay (min)" = predicted_delay,
         "Wind (km/h)" = wind_speed_10m
       ) |>
       mutate(
         "Departure Time" = format(`Departure Time`, "%Y-%m-%d %H:%M"),
-        "Delay (min)" = round(`Delay (min)`, 1),
+        "Predicted Delay (min)" = round(`Predicted Delay (min)`, 1),
         "Wind (km/h)" = round(`Wind (km/h)`, 1)
       ) |>
       arrange(desc(`Departure Time`))
