@@ -7,7 +7,6 @@ library(sys)
 library(shinyjs)
 library(tidymodels)
 
-# Load the trained ML model
 trained_model <- readRDS("model_training.rds")
 
 flights_data <- read_csv("data/cleaned/flights_with_weather.csv", show_col_types = FALSE)
@@ -18,12 +17,10 @@ flights_data <- flights_data |>
     hour_of_day = hour(departure_estimated),
     day_of_week = wday(departure_estimated, label = TRUE),
     date = date(departure_estimated),
-    # Cap extreme delay outliers at 300 minutes for data validation
     departure_delay_capped = pmin(departure_delay, 300),
-    # Ensure departure_delay is numeric and handle outliers
     departure_delay = as.numeric(departure_delay),
     departure_delay = case_when(
-      departure_delay > 300 ~ NA_real_,  # Flag extreme outliers as missing
+      departure_delay > 300 ~ NA_real_,
       TRUE ~ departure_delay
     )
   ) |>
@@ -204,8 +201,6 @@ server <- function(input, output, session) {
       
       removeModal()
       refresh_status(paste("Last updated:", format(Sys.time(), "%H:%M:%S")))
-      # Do NOT reload page - reactivity handles updates automatically
-      # Just show success message
       showModal(modalDialog(
         title = "Refresh Complete",
         paste("Data updated successfully. Total flights:", nrow(flights_data)),
@@ -242,7 +237,6 @@ server <- function(input, output, session) {
   })
   
   output$total_flights <- renderText({
-    # Count total flights from full dataset, not filtered
     total <- nrow(flights_data)
     paste("Total Flights:", total)
   })
@@ -297,7 +291,6 @@ server <- function(input, output, session) {
       ) |>
       filter(flight_count > 0)
     
-    # Find first and last hours with data, but start viewing at Hour 9
     min_hour <- max(9, min(data$hour_of_day))
     max_hour <- max(data$hour_of_day)
     
@@ -334,7 +327,6 @@ server <- function(input, output, session) {
         .groups = "drop"
       ) |>
       filter(flight_count >= 3) |>
-      # Group airlines with <5 min avg delay into "Other Carriers"
       mutate(
         display_airline = case_when(
           avg_delay < 5 ~ "Other Carriers (Reliable)",
@@ -378,9 +370,8 @@ server <- function(input, output, session) {
     data <- flights_data |>
       filter(!is.na(wind_speed_10m), !is.na(departure_delay),
              departure_delay > -50, departure_delay < 150) |>
-      # Aggregate wind speeds into 0.5 km/h increments
       mutate(
-        wind_bucket = round(wind_speed_10m * 2) / 2  # Round to nearest 0.5
+        wind_bucket = round(wind_speed_10m * 2) / 2
       ) |>
       group_by(wind_bucket) |>
       summarise(
@@ -388,9 +379,8 @@ server <- function(input, output, session) {
         flight_count = n(),
         .groups = "drop"
       ) |>
-      filter(flight_count >= 3)  # Only keep buckets with sufficient data
+      filter(flight_count >= 3)
     
-    # Find max wind with data and cap display at 25 km/h or actual max
     max_wind <- min(25, max(data$wind_bucket, na.rm = TRUE))
     data_trimmed <- data |> filter(wind_bucket <= max_wind)
     
@@ -422,6 +412,8 @@ server <- function(input, output, session) {
   })
   
   output$temporal_risk_heatmap <- renderPlotly({
+    min_samples <- 3
+    
     data <- flights_data |>
       filter(!is.na(departure_delay)) |>
       group_by(hour_of_day, day_of_week) |>
@@ -430,57 +422,67 @@ server <- function(input, output, session) {
         flight_count = n(),
         .groups = "drop"
       ) |>
-      # Floor negative delays at 0 (no such thing as negative departure delay)
       mutate(
         avg_delay = pmax(avg_delay, 0),
-        # Create binned delay categories for clearer visualization
-        delay_bin = case_when(
-          avg_delay >= 0 & avg_delay < 5 ~ "0–5 min\n(On-time)",
-          avg_delay >= 5 & avg_delay < 15 ~ "5–15 min\n(Minor)",
-          avg_delay >= 15 & avg_delay < 30 ~ "15–30 min\n(Moderate)",
-          avg_delay >= 30 ~ "30+ min\n(Severe)"
+        delay_category = case_when(
+          flight_count == 0 ~ "No departures",
+          flight_count < min_samples ~ "Insufficient data",
+          flight_count >= min_samples & avg_delay >= 0 & avg_delay < 5 ~ "0–5 min",
+          flight_count >= min_samples & avg_delay >= 5 & avg_delay < 15 ~ "5–15 min",
+          flight_count >= min_samples & avg_delay >= 15 & avg_delay < 30 ~ "15–30 min",
+          flight_count >= min_samples & avg_delay >= 30 ~ "30+ min",
+          TRUE ~ "No data"
         ),
-        # Numeric version for plotting
-        delay_numeric = case_when(
-          avg_delay >= 0 & avg_delay < 5 ~ 1,
-          avg_delay >= 5 & avg_delay < 15 ~ 2,
-          avg_delay >= 15 & avg_delay < 30 ~ 3,
-          avg_delay >= 30 ~ 4
+        delay_category = factor(
+          delay_category,
+          levels = c(
+            "0–5 min",
+            "5–15 min",
+            "15–30 min",
+            "30+ min",
+            "Insufficient data",
+            "No departures",
+            "No data"
+          ),
+          ordered = TRUE
         )
       )
     
-    p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = factor(delay_numeric, labels = c("1" = "0–5 min\n(On-time)", "2" = "5–15 min\n(Minor)", "3" = "15–30 min\n(Moderate)", "4" = "30+ min\n(Severe)")))) +
+    p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = delay_category)) +
       geom_tile(color = "white", size = 0.5) +
-      # Explicit binned color scale: Green → Yellow → Orange → Dark Red
       scale_fill_manual(
-        name = "Average Delay",
+        name = "Departure Delay Category",
         values = c(
-          "0–5 min\n(On-time)" = "#27ae60",      # Green
-          "5–15 min\n(Minor)" = "#f39c12",        # Orange
-          "15–30 min\n(Moderate)" = "#e67e22",    # Dark Orange
-          "30+ min\n(Severe)" = "#c0392b"         # Dark Red
-        ),
-        labels = c(
-          "0–5 min\n(On-time)" = "0–5 min (On-time)",
-          "5–15 min\n(Minor)" = "5–15 min (Minor delay)",
-          "15–30 min\n(Moderate)" = "15–30 min (Moderate delay)",
-          "30+ min\n(Severe)" = "30+ min (Severe delay)"
+          "0–5 min" = "#27ae60",
+          "5–15 min" = "#f39c12",
+          "15–30 min" = "#e67e22",
+          "30+ min" = "#c0392b",
+          "Insufficient data" = "#d3d3d3",
+          "No departures" = "#f5f5f5",
+          "No data" = "#e8e8e8"
         )
       ) +
       scale_x_continuous(breaks = seq(0, 23, 2)) +
       theme_minimal() +
       theme(
         plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
-        plot.subtitle = element_text(size = 11, color = "#555555", margin = margin(b = 10)),
+        plot.subtitle = element_text(size = 11, color = "#555555", margin = margin(b = 10), hjust = 0),
         axis.title = element_text(face = "bold", size = 12),
         axis.text = element_text(size = 10),
         legend.position = "right",
+        legend.title = element_text(face = "bold", size = 11),
+        legend.text = element_text(size = 10),
         plot.background = element_rect(fill = "transparent", color = NA),
         panel.background = element_rect(fill = "transparent", color = NA)
       ) +
       labs(
-        title = "Average Departure Delay (Minutes) by Hour of Day and Day of Week",
-        subtitle = "Observed average delays across all flights. Green indicates typically on-time operations; red indicates higher average delays.",
+        title = "Average Departure Delay by Hour of Day and Day of Week",
+        subtitle = paste0(
+          "Historical observed averages (n ≥ ", min_samples, " flights per cell). ",
+          "These represent actual delay patterns from historical data and do not imply causality or guarantee future outcomes. ",
+          "Delays of 30+ minutes are shown in dark red and include all higher values. ",
+          "Light gray indicates cells with fewer than ", min_samples, " flights (unreliable) or no scheduled departures."
+        ),
         x = "Hour of Day",
         y = "Day of Week"
       )
@@ -490,7 +492,6 @@ server <- function(input, output, session) {
   })
   
   output$flight_table <- renderDT({
-    # Filter to only yesterday and today
     today <- Sys.Date()
     yesterday <- today - 1
     
@@ -508,20 +509,15 @@ server <- function(input, output, session) {
         day_of_week
       )
     
-    # Generate predictions if we have data
     if (nrow(data) > 0) {
-      # Prepare data for prediction (match model features from training)
-      # Model was trained with: airline_name, departure_iata, arrival_iata, hour_of_day, day_of_week (numeric), wind_speed_10m
       data_for_pred <- data |>
         mutate(
-          day_of_week = as.numeric(day_of_week)  # Convert factor to numeric
+          day_of_week = as.numeric(day_of_week)
         ) |>
         select(airline_name, departure_iata, arrival_iata, hour_of_day, day_of_week, wind_speed_10m)
       
-      # Make predictions
       tryCatch({
         predicted_delays <- predict(trained_model, data_for_pred)
-        # Extract prediction values (result is a tibble with .pred column)
         if (is.data.frame(predicted_delays)) {
           predicted_values <- predicted_delays$.pred
         } else {
@@ -530,7 +526,6 @@ server <- function(input, output, session) {
         data <- data |>
           mutate(predicted_delay = as.numeric(predicted_values))
       }, error = function(e) {
-        # If prediction fails, log and use NA
         warning("Prediction error: ", conditionMessage(e))
         data <<- data |>
           mutate(predicted_delay = NA_real_)
