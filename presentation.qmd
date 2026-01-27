@@ -8,10 +8,9 @@ format:
     theme: sky
     slide-number: true
     toc: false
-    chalkboard: true
     transition: fade
     code-line-numbers: false
-    highlight-style: monokai
+    highlight-style: github
 ---
 ## Introduction
 
