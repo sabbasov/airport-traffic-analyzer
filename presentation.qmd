@@ -5,7 +5,7 @@ author: "Sabuhi Abbasov"
 date: today
 format: 
   revealjs:
-    theme: [simple, dark]
+    theme: sky
     slide-number: true
     toc: false
     chalkboard: true
@@ -13,36 +13,34 @@ format:
     code-line-numbers: false
     highlight-style: monokai
 ---
-
-# Introduction
+## Introduction
 
 - **Goal:** Analyze and predict flight departure delays using real-world data
 - **Why:** Delays cost time, money, and disrupt travel plans
 
 ---
 
-# Data Source & Pipeline
+## Data Source & Pipeline
 
 - **API:** Purchased real flight and weather data ($50)
-- **Dataset:** 1,709 flights, 7+ features (airline, airports, time, wind, etc.)
+- **Dataset:** 1,700+ flights, 7+ features (airline, airports, time, wind, etc.)
 - **Pipeline:** Automated fetch, clean, merge, and update (Python + R)
-- **Live Data:** Dashboard refreshes with new data with a button
 
 ---
 
-# Data Preparation & Cleaning
+## Data Preparation & Cleaning
 
 - **Data wrangling:** 
   - Removed incomplete/duplicate records
   - Engineered features (hour, day of week, wind buckets)
-  - Capped extreme outliers for delay at 120 min
-- **Integrity checks:** Ensured all predictions use the same schema as training
+  - Limited extreme outliers for delay after 120 min
+- **Integrity checks:** All predictions use the same schema as training
 
 ---
 
-# Exploratory Data Analysis
+## Exploratory Data Analysis
 
-## Delay Distribution
+### Delay Distribution
 
 ![](graphs/delay_distribution.png)
 
@@ -51,7 +49,7 @@ format:
 
 ---
 
-## Average Delay by Hour
+### Average Delay by Hour
 
 ![](graphs/avg_delay_by_hour.png)
 
@@ -61,17 +59,16 @@ format:
 
 ---
 
-## Airline Performance
+### Airline Performance
 
 ![](graphs/airline_ranking.png)
 
-- **Ranking:** Airlines sorted by average delay
-- **Key finding:** Some carriers (Air Incheon, UPS) have much higher delays
-- **Actionable:** Choose airlines with lower average delays for fewer disruptions
+- **Finding:** Some carriers (Air Incheon, UPS) have much higher delays
+- **Insight:** Choosing airlines with lower average delays is smarter
 
 ---
 
-## Temporal Delay Patterns
+### Temporal Delay Patterns
 
 ![](graphs/heatmap.png)
 
@@ -82,73 +79,51 @@ format:
 
 ---
 
-## Wind Speed vs Delay
+### Wind Speed vs Delay
 
 ![](graphs/wind_vs_delay.png)
 
 - **Hypothesis:** Higher wind = more delays?
 - **Finding:** No strong correlation; delays do not consistently increase with wind
-- **Lesson:** Simple factors are not enough—need multi-feature models
+- **Lesson:** Simple factors are not enough — we need multi-feature models
 
 ---
 
-# Machine Learning Model
+## Machine Learning Model
 
-- **Model:** Random Forest Regression
+- **Model:** Random Forest Regression (in progress)
 - **Features:** Airline, departure/arrival airport, hour, day, wind speed
 - **Target:** Departure delay (minutes)
-- **Validation:** Trained/tested on historical data
-- **Deployment:** Model predicts delays for new flights in real time
+- **Deployment:** It will predict delays for new flights in real time (future work)
+- **Note:** Still being developed and tested. The dashboard shows predictions for today's flights.
 
 ---
 
-# Interactive Dashboard
+## Interactive Dashboard
 
 - **Built with:** R Shiny + Plotly
-- **Features:**
-  - **Live Metrics:** Updates with filters and new data
-  - **System Refresh:** Fetches latest flights and weather
-  - **Flight Table:** Search, filter, and see ML-predicted delays
-  - **Visualizations:** All insights available interactively
+- **Live Metrics:** Updates as you filter by airline or hour
+- **System Refresh:** Latest flight and weather data
+- **Visual Exploration:** Tabs to compare airlines, graphs to spot risky hours, and more
 
 ---
 
-## Live Demo
+## Lessons Learned
 
-- **Showcase:** Filtering by airline, hour, and seeing metrics update
-- **System Refresh:** Demonstrate real-time data update
-- **Flight Table:** Show predicted delays for upcoming flights
-
----
-
-# Technical Highlights
-
-- **Data pipeline automation:** Python + R integration
-- **Reactive dashboard:** Shiny’s reactivity for instant feedback
-- **Professional polish:** Clean UI, custom color scales, clear legends
-- **Error handling:** Robust to missing/insufficient data
-
----
-
-# Lessons Learned
-
-- **Real data is messy:** Cleaning and validation are critical
+- **Real data is messy:** Cleaning and validation are important
 - **Not all features matter:** Wind was a weak predictor
-- **ML adds value:** Combining features yields better predictions
-- **Automation saves time:** System refresh and data sync are essential
+- **ML adds value:** Combining features gives better predictions
 
 ---
 
-# Conclusion
+## Conclusion
 
-- **Airport Traffic Analyzer** delivers actionable insights from real data
-- **Professional workflow:** From data purchase to live dashboard
-- **Ready for real-world use:** Predicts delays, guides decisions, and updates live
+- Purchased and processed live flight and weather data.
+- You can actually use this to pick better airlines and avoid risky hours.
+- The machine learning model is in progress.
 
 ---
 
-# Thank You!
+## Thank you
 
 Questions?
-
----

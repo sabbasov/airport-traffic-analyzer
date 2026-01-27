@@ -6,7 +6,7 @@
 <script src="presentation_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="presentation_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="presentation_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="presentation_files/libs/quarto-html/quarto-syntax-highlighting-dark-9e15f8fb9e1f2f288bfbe28f6ca11029.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="presentation_files/libs/quarto-html/quarto-syntax-highlighting-9e15f8fb9e1f2f288bfbe28f6ca11029.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="author" content="Sabuhi Abbasov">
@@ -30,7 +30,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="presentation_files/libs/revealjs/dist/theme/quarto-c1e0facba656ca09fa54ddbd14af9206.css">
+  <link rel="stylesheet" href="presentation_files/libs/revealjs/dist/theme/quarto-d89f3a6d8b1e47802a38c3c2f70c5243.css">
   <link href="presentation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="presentation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -125,7 +125,7 @@
     }
   </style>
 </head>
-<body class="quarto-dark">
+<body class="quarto-light">
   <div class="reveal">
     <div class="slides">
 
@@ -143,61 +143,45 @@ Sabuhi Abbasov
 
   <p class="date">2026-01-27</p>
 </section>
-<section>
-<section id="introduction" class="title-slide slide level1 center">
-<h1>Introduction</h1>
+<section id="introduction" class="slide level2">
+<h2>Introduction</h2>
 <ul>
 <li><strong>Goal:</strong> Analyze and predict flight departure delays using real-world data</li>
 <li><strong>Why:</strong> Delays cost time, money, and disrupt travel plans</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="data-source-pipeline" class="title-slide slide level1 center">
-<h1>Data Source &amp; Pipeline</h1>
+<section id="data-source-pipeline" class="slide level2">
+<h2>Data Source &amp; Pipeline</h2>
 <ul>
 <li><strong>API:</strong> Purchased real flight and weather data ($50)</li>
-<li><strong>Dataset:</strong> 1,709 flights, 7+ features (airline, airports, time, wind, etc.)</li>
+<li><strong>Dataset:</strong> 1,700+ flights, 7+ features (airline, airports, time, wind, etc.)</li>
 <li><strong>Pipeline:</strong> Automated fetch, clean, merge, and update (Python + R)</li>
-<li><strong>Live Data:</strong> Dashboard refreshes with new data with a button</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="data-preparation-cleaning" class="title-slide slide level1 center">
-<h1>Data Preparation &amp; Cleaning</h1>
+<section id="data-preparation-cleaning" class="slide level2">
+<h2>Data Preparation &amp; Cleaning</h2>
 <ul>
 <li><strong>Data wrangling:</strong>
 <ul>
 <li>Removed incomplete/duplicate records</li>
 <li>Engineered features (hour, day of week, wind buckets)</li>
-<li>Capped extreme outliers for delay at 120 min</li>
+<li>Limited extreme outliers for delay after 120 min</li>
 </ul></li>
-<li><strong>Integrity checks:</strong> Ensured all predictions use the same schema as training</li>
+<li><strong>Integrity checks:</strong> All predictions use the same schema as training</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="exploratory-data-analysis" class="title-slide slide level1 center">
-<h1>Exploratory Data Analysis</h1>
-
-</section>
-<section id="delay-distribution" class="slide level2">
-<h2>Delay Distribution</h2>
+<section id="exploratory-data-analysis" class="slide level2">
+<h2>Exploratory Data Analysis</h2>
+<h3 id="delay-distribution">Delay Distribution</h3>
 
 <img data-src="graphs/delay_distribution.png" class="r-stretch"><ul>
 <li>Most flights are on time (0 min delay)</li>
 <li>Delays are right-skewed; a few flights experience significant delays</li>
 </ul>
 </section>
-<section id="average-delay-by-hour" class="slide level2">
-<h2>Average Delay by Hour</h2>
+<section class="slide level2">
+
+<h3 id="average-delay-by-hour">Average Delay by Hour</h3>
 
 <img data-src="graphs/avg_delay_by_hour.png" class="r-stretch"><ul>
 <li><strong>Morning flights:</strong> Minimal delays</li>
@@ -205,17 +189,18 @@ Sabuhi Abbasov
 <li><strong>Insight:</strong> Booking earlier flights seems smarter</li>
 </ul>
 </section>
-<section id="airline-performance" class="slide level2">
-<h2>Airline Performance</h2>
+<section class="slide level2">
+
+<h3 id="airline-performance">Airline Performance</h3>
 
 <img data-src="graphs/airline_ranking.png" class="r-stretch"><ul>
-<li><strong>Ranking:</strong> Airlines sorted by average delay</li>
-<li><strong>Key finding:</strong> Some carriers (Air Incheon, UPS) have much higher delays</li>
-<li><strong>Actionable:</strong> Choose airlines with lower average delays for fewer disruptions</li>
+<li><strong>Finding:</strong> Some carriers (Air Incheon, UPS) have much higher delays</li>
+<li><strong>Insight:</strong> Choosing airlines with lower average delays is smarter</li>
 </ul>
 </section>
-<section id="temporal-delay-patterns" class="slide level2">
-<h2>Temporal Delay Patterns</h2>
+<section class="slide level2">
+
+<h3 id="temporal-delay-patterns">Temporal Delay Patterns</h3>
 
 <img data-src="graphs/heatmap.png" class="r-stretch"><ul>
 <li><strong>Heatmap:</strong> Average delay by hour and day of week</li>
@@ -224,104 +209,56 @@ Sabuhi Abbasov
 <li><strong>Note:</strong> Colors represent historical averages, not causality</li>
 </ul>
 </section>
-<section id="wind-speed-vs-delay" class="slide level2">
-<h2>Wind Speed vs Delay</h2>
+<section class="slide level2">
+
+<h3 id="wind-speed-vs-delay">Wind Speed vs Delay</h3>
 
 <img data-src="graphs/wind_vs_delay.png" class="r-stretch"><ul>
 <li><strong>Hypothesis:</strong> Higher wind = more delays?</li>
 <li><strong>Finding:</strong> No strong correlation; delays do not consistently increase with wind</li>
-<li><strong>Lesson:</strong> Simple factors are not enough—need multi-feature models</li>
+<li><strong>Lesson:</strong> Simple factors are not enough — we need multi-feature models</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="machine-learning-model" class="title-slide slide level1 center">
-<h1>Machine Learning Model</h1>
+<section id="machine-learning-model" class="slide level2">
+<h2>Machine Learning Model</h2>
 <ul>
-<li><strong>Model:</strong> Random Forest Regression</li>
+<li><strong>Model:</strong> Random Forest Regression (in progress)</li>
 <li><strong>Features:</strong> Airline, departure/arrival airport, hour, day, wind speed</li>
 <li><strong>Target:</strong> Departure delay (minutes)</li>
-<li><strong>Validation:</strong> Trained/tested on historical data</li>
-<li><strong>Deployment:</strong> Model predicts delays for new flights in real time</li>
+<li><strong>Deployment:</strong> It will predict delays for new flights in real time (future work)</li>
+<li><strong>Note:</strong> Still being developed and tested. The dashboard shows predictions for today’s flights.</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="interactive-dashboard" class="title-slide slide level1 center">
-<h1>Interactive Dashboard</h1>
+<section id="interactive-dashboard" class="slide level2">
+<h2>Interactive Dashboard</h2>
 <ul>
 <li><strong>Built with:</strong> R Shiny + Plotly</li>
-<li><strong>Features:</strong>
-<ul>
-<li><strong>Live Metrics:</strong> Updates with filters and new data</li>
-<li><strong>System Refresh:</strong> Fetches latest flights and weather</li>
-<li><strong>Flight Table:</strong> Search, filter, and see ML-predicted delays</li>
-<li><strong>Visualizations:</strong> All insights available interactively</li>
-</ul></li>
+<li><strong>Live Metrics:</strong> Updates as you filter by airline or hour</li>
+<li><strong>System Refresh:</strong> Latest flight and weather data</li>
+<li><strong>Visual Exploration:</strong> Tabs to compare airlines, graphs to spot risky hours, and more</li>
 </ul>
 </section>
-<section id="live-demo" class="slide level2">
-<h2>Live Demo</h2>
+<section id="lessons-learned" class="slide level2">
+<h2>Lessons Learned</h2>
 <ul>
-<li><strong>Showcase:</strong> Filtering by airline, hour, and seeing metrics update</li>
-<li><strong>System Refresh:</strong> Demonstrate real-time data update</li>
-<li><strong>Flight Table:</strong> Show predicted delays for upcoming flights</li>
-</ul>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="technical-highlights" class="title-slide slide level1 center">
-<h1>Technical Highlights</h1>
-<ul>
-<li><strong>Data pipeline automation:</strong> Python + R integration</li>
-<li><strong>Reactive dashboard:</strong> Shiny’s reactivity for instant feedback</li>
-<li><strong>Professional polish:</strong> Clean UI, custom color scales, clear legends</li>
-<li><strong>Error handling:</strong> Robust to missing/insufficient data</li>
-</ul>
-</section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="lessons-learned" class="title-slide slide level1 center">
-<h1>Lessons Learned</h1>
-<ul>
-<li><strong>Real data is messy:</strong> Cleaning and validation are critical</li>
+<li><strong>Real data is messy:</strong> Cleaning and validation are important</li>
 <li><strong>Not all features matter:</strong> Wind was a weak predictor</li>
-<li><strong>ML adds value:</strong> Combining features yields better predictions</li>
-<li><strong>Automation saves time:</strong> System refresh and data sync are essential</li>
+<li><strong>ML adds value:</strong> Combining features gives better predictions</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="conclusion" class="title-slide slide level1 center">
-<h1>Conclusion</h1>
+<section id="conclusion" class="slide level2">
+<h2>Conclusion</h2>
 <ul>
-<li><strong>Airport Traffic Analyzer</strong> delivers actionable insights from real data</li>
-<li><strong>Professional workflow:</strong> From data purchase to live dashboard</li>
-<li><strong>Ready for real-world use:</strong> Predicts delays, guides decisions, and updates live</li>
+<li>Purchased and processed live flight and weather data.</li>
+<li>You can actually use this to pick better airlines and avoid risky hours.</li>
+<li>The machine learning model is in progress.</li>
 </ul>
 </section>
-<section class="slide level2">
-
-</section></section>
-<section>
-<section id="thank-you" class="title-slide slide level1 center">
-<h1>Thank You!</h1>
+<section id="thank-you" class="slide level2">
+<h2>Thank you</h2>
 <p>Questions?</p>
+
 </section>
-<section class="slide level2">
-
-
-</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">
