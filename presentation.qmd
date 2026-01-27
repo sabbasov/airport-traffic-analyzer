@@ -5,6 +5,7 @@ author: "Sabuhi Abbasov"
 date: today
 format: 
   revealjs:
+  
     theme: sky
     slide-number: true
     toc: false
@@ -22,7 +23,7 @@ format:
 ## Data Source & Pipeline
 
 - **API:** Purchased real flight and weather data ($50)
-- **Dataset:** 1,700+ flights, 7+ features (airline, airports, time, wind, etc.)
+- **Dataset:** 1,800+ flights, 3+ features (airline, airports, wind, etc.)
 - **Pipeline:** Automated fetch, clean, merge, and update (Python + R)
 
 ---
@@ -55,6 +56,7 @@ format:
 - **Morning flights:** Minimal delays
 - **Evening flights:** Delays spike after 17:00
 - **Insight:** Booking earlier flights seems smarter
+- Early bird gets the bird; night owl gets the terminal floor.
 
 ---
 
@@ -64,6 +66,12 @@ format:
 
 - **Finding:** Some carriers (Air Incheon, UPS) have much higher delays
 - **Insight:** Choosing airlines with lower average delays is smarter
+
+---
+
+###
+
+![](graphs/airline_ranking.png)
 
 ---
 
@@ -78,6 +86,12 @@ format:
 
 ---
 
+###
+
+![](graphs/heatmap.png)
+
+---
+
 ### Wind Speed vs Delay
 
 ![](graphs/wind_vs_delay.png)
@@ -85,6 +99,12 @@ format:
 - **Hypothesis:** Higher wind = more delays?
 - **Finding:** No strong correlation; delays do not consistently increase with wind
 - **Lesson:** Simple factors are not enough — we need multi-feature models
+
+---
+
+###
+
+![](graphs/wind_vs_delay.png)
 
 ---
 
