@@ -429,19 +429,49 @@ server <- function(input, output, session) {
         avg_delay = mean(departure_delay, na.rm = TRUE),
         flight_count = n(),
         .groups = "drop"
+      ) |>
+      # Floor negative delays at 0 (no such thing as negative departure delay)
+      mutate(
+        avg_delay = pmax(avg_delay, 0),
+        # Create binned delay categories for clearer visualization
+        delay_bin = case_when(
+          avg_delay >= 0 & avg_delay < 5 ~ "0–5 min\n(On-time)",
+          avg_delay >= 5 & avg_delay < 15 ~ "5–15 min\n(Minor)",
+          avg_delay >= 15 & avg_delay < 30 ~ "15–30 min\n(Moderate)",
+          avg_delay >= 30 ~ "30+ min\n(Severe)"
+        ),
+        # Numeric version for plotting
+        delay_numeric = case_when(
+          avg_delay >= 0 & avg_delay < 5 ~ 1,
+          avg_delay >= 5 & avg_delay < 15 ~ 2,
+          avg_delay >= 15 & avg_delay < 30 ~ 3,
+          avg_delay >= 30 ~ 4
+        )
       )
     
-    p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = avg_delay)) +
+    p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = factor(delay_numeric, labels = c("1" = "0–5 min\n(On-time)", "2" = "5–15 min\n(Minor)", "3" = "15–30 min\n(Moderate)", "4" = "30+ min\n(Severe)")))) +
       geom_tile(color = "white", size = 0.5) +
-      scale_fill_gradientn(colors = c("#27ae60", "#f1c40f", "#e67e22", "#c0392b"),
-                           values = c(0, 0.3, 0.6, 1),
-                           limits = c(-10, 30),
-                           name = "Avg Delay\n(min)",
-                           na.value = "#cccccc") +
+      # Explicit binned color scale: Green → Yellow → Orange → Dark Red
+      scale_fill_manual(
+        name = "Average Delay",
+        values = c(
+          "0–5 min\n(On-time)" = "#27ae60",      # Green
+          "5–15 min\n(Minor)" = "#f39c12",        # Orange
+          "15–30 min\n(Moderate)" = "#e67e22",    # Dark Orange
+          "30+ min\n(Severe)" = "#c0392b"         # Dark Red
+        ),
+        labels = c(
+          "0–5 min\n(On-time)" = "0–5 min (On-time)",
+          "5–15 min\n(Minor)" = "5–15 min (Minor delay)",
+          "15–30 min\n(Moderate)" = "15–30 min (Moderate delay)",
+          "30+ min\n(Severe)" = "30+ min (Severe delay)"
+        )
+      ) +
       scale_x_continuous(breaks = seq(0, 23, 2)) +
       theme_minimal() +
       theme(
         plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
+        plot.subtitle = element_text(size = 11, color = "#555555", margin = margin(b = 10)),
         axis.title = element_text(face = "bold", size = 12),
         axis.text = element_text(size = 10),
         legend.position = "right",
@@ -449,8 +479,8 @@ server <- function(input, output, session) {
         panel.background = element_rect(fill = "transparent", color = NA)
       ) +
       labs(
-        title = "Temporal Risk Heatmap: Danger Zones by Hour & Day",
-        subtitle = "Green = safe booking times, Red = high delay risk",
+        title = "Average Departure Delay (Minutes) by Hour of Day and Day of Week",
+        subtitle = "Observed average delays across all flights. Green indicates typically on-time operations; red indicates higher average delays.",
         x = "Hour of Day",
         y = "Day of Week"
       )
