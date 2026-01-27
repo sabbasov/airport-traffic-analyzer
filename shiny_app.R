@@ -12,9 +12,17 @@ flights_data <- flights_data |>
     departure_estimated = as_datetime(departure_estimated),
     hour_of_day = hour(departure_estimated),
     day_of_week = wday(departure_estimated, label = TRUE),
-    date = date(departure_estimated)
+    date = date(departure_estimated),
+    # Cap extreme delay outliers at 300 minutes for data validation
+    departure_delay_capped = pmin(departure_delay, 300),
+    # Ensure departure_delay is numeric and handle outliers
+    departure_delay = as.numeric(departure_delay),
+    departure_delay = case_when(
+      departure_delay > 300 ~ NA_real_,  # Flag extreme outliers as missing
+      TRUE ~ departure_delay
+    )
   ) |>
-  filter(!is.na(airline_name))
+  filter(!is.na(airline_name), !is.na(flight_number), flight_number != "")
 
 airlines <- sort(unique(flights_data$airline_name))
 
@@ -106,24 +114,35 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         tabPanel(
-          "Wind Impact",
+          "Airline Comparison",
           br(),
-          p("Wind speed significantly influences departure delays. This hexbin density plot shows the relationship across 897 flights.", 
+          p("Ranked by average delay. Choose airlines with consistently low delays to avoid operational disruptions.", 
             style = "color: #666; font-size: 14px; margin-bottom: 15px;"),
-          plotlyOutput("wind_scatter", height = "500px"),
+          plotlyOutput("airline_delay_comparison", height = "550px"),
           br(),
-          p("Strong patterns emerge: low wind (0-10 km/h) correlates with minimal delays, while higher wind speeds increase variability.",
+          p("Red indicators show carriers with significant delays; use this ranking for booking decisions.",
             style = "color: #666; font-size: 14px; margin-top: 15px;")
         ),
         
         tabPanel(
-          "Airline Reliability",
+          "Wind Sensitivity",
           br(),
-          p("Top 12 airlines ranked by average departure delay. Consistency indicates operational excellence.",
+          p("Scatter plot with trend line showing the exact correlation between wind speed and delays. Identifies the critical wind speed threshold where delays spike.",
             style = "color: #666; font-size: 14px; margin-bottom: 15px;"),
-          plotlyOutput("airline_rankings", height = "500px"),
+          plotlyOutput("wind_sensitivity_index", height = "550px"),
           br(),
-          p("Airlines with lower average delays demonstrate superior logistics and resource management.",
+          p("If wind exceeds the trend line spike point, expect potential delays. Plan buffer time accordingly.",
+            style = "color: #666; font-size: 14px; margin-top: 15px;")
+        ),
+        
+        tabPanel(
+          "Temporal Risk",
+          br(),
+          p("Heatmap identifying danger zones for delays by hour of day and day of week. Red zones indicate highest risk times.",
+            style = "color: #666; font-size: 14px; margin-bottom: 15px;"),
+          plotlyOutput("temporal_risk_heatmap", height = "550px"),
+          br(),
+          p("Book flights during green zones (low delay hours) on preferred days. Avoid peak hours and high-risk combinations.",
             style = "color: #666; font-size: 14px; margin-top: 15px;")
         ),
         
@@ -164,9 +183,14 @@ server <- function(input, output, session) {
           departure_estimated = as_datetime(departure_estimated),
           hour_of_day = hour(departure_estimated),
           day_of_week = wday(departure_estimated, label = TRUE),
-          date = date(departure_estimated)
+          date = date(departure_estimated),
+          departure_delay = as.numeric(departure_delay),
+          departure_delay = case_when(
+            departure_delay > 300 ~ NA_real_,
+            TRUE ~ departure_delay
+          )
         ) |>
-        filter(!is.na(airline_name))
+        filter(!is.na(airline_name), !is.na(flight_number), flight_number != "")
       
       removeModal()
       refresh_status(paste("Last updated:", format(Sys.time(), "%H:%M:%S")))
@@ -276,66 +300,101 @@ server <- function(input, output, session) {
       layout(plot_bgcolor = "rgba(0,0,0,0)", paper_bgcolor = "rgba(0,0,0,0)")
   })
   
-  output$airline_rankings <- renderPlotly({
+  output$airline_delay_comparison <- renderPlotly({
     data <- flights_data |>
+      filter(!is.na(airline_name), !is.na(departure_delay)) |>
       group_by(airline_name) |>
       summarise(
         avg_delay = mean(departure_delay, na.rm = TRUE),
         flight_count = n(),
-        on_time_percentage = sum(departure_delay <= 0, na.rm = TRUE) / n() * 100,
         .groups = "drop"
       ) |>
       filter(flight_count >= 3) |>
-      arrange(avg_delay) |>
-      head(12)
+      arrange(desc(avg_delay))
     
-    p <- ggplot(data, aes(x = reorder(airline_name, avg_delay), y = avg_delay, fill = avg_delay)) +
-      geom_col(color = "white") +
-      scale_fill_gradient(low = "#6f42c1", high = "#d73a49", name = "Avg Delay\n(min)") +
+    p <- ggplot(data, aes(x = reorder(airline_name, -avg_delay), y = avg_delay, fill = avg_delay)) +
+      geom_col(color = "white", size = 0.5) +
+      scale_fill_gradient(low = "#27ae60", high = "#e74c3c", name = "Avg Delay\n(min)") +
       coord_flip() +
       theme_minimal() +
       theme(
-        plot.title = element_text(face = "bold", size = 16),
+        plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
         axis.title.x = element_text(face = "bold", size = 12),
         axis.title.y = element_blank(),
+        axis.text = element_text(size = 10),
         legend.position = "right",
         plot.background = element_rect(fill = "transparent", color = NA),
         panel.background = element_rect(fill = "transparent", color = NA),
-        panel.grid = element_line(color = "#f0f0f0")
+        panel.grid.major.x = element_line(color = "#f0f0f0", size = 0.3)
       ) +
       labs(
-        title = "Top 12 Airlines by Reliability (Lower Delay = Better)",
-        y = "Average Delay (minutes)"
-      ) +
-      ylim(0, max(data$avg_delay) * 1.1)
+        title = "Airlines Ranked by Delay (Most to Least Delayed)",
+        subtitle = "Green = reliable, Red = problematic",
+        x = "Average Delay (minutes)"
+      )
     
-    ggplotly(p, tooltip = c("x", "y", "fill")) |>
+    ggplotly(p, tooltip = c("x", "y")) |>
       layout(plot_bgcolor = "rgba(0,0,0,0)", paper_bgcolor = "rgba(0,0,0,0)")
   })
   
-  output$wind_scatter <- renderPlotly({
-    data <- filtered_data() |>
-      filter(!is.na(wind_speed_10m), !is.na(departure_delay), 
-             departure_delay > -100, departure_delay < 500)
+  output$wind_sensitivity_index <- renderPlotly({
+    data <- flights_data |>
+      filter(!is.na(wind_speed_10m), !is.na(departure_delay),
+             departure_delay > -50, departure_delay < 150)
     
     p <- ggplot(data, aes(x = wind_speed_10m, y = departure_delay)) +
-      geom_hex(bins = 25, fill = "#0066cc", alpha = 0.85) +
-      scale_fill_gradient(low = "#e3f2fd", high = "#d73a49", name = "Frequency") +
+      geom_point(alpha = 0.3, color = "#0066cc", size = 2) +
+      geom_smooth(method = "loess", color = "#d73a49", size = 1.2, fill = "#e3f2fd", alpha = 0.2) +
       theme_minimal() +
       theme(
-        plot.title = element_text(face = "bold", size = 16),
+        plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
+        axis.title = element_text(face = "bold", size = 12),
+        axis.text = element_text(size = 10),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        panel.background = element_rect(fill = "transparent", color = NA),
+        panel.grid.major = element_line(color = "#f0f0f0", size = 0.3)
+      ) +
+      labs(
+        title = "Wind Speed vs Delay Correlation (With Trend Line)",
+        subtitle = "Red trend line shows risk threshold - expect delays beyond spike point",
+        x = "Wind Speed (km/h)",
+        y = "Departure Delay (minutes)"
+      )
+    
+    ggplotly(p, tooltip = c("x", "y")) |>
+      layout(plot_bgcolor = "rgba(0,0,0,0)", paper_bgcolor = "rgba(0,0,0,0)")
+  })
+  
+  output$temporal_risk_heatmap <- renderPlotly({
+    data <- flights_data |>
+      filter(!is.na(departure_delay)) |>
+      group_by(hour_of_day, day_of_week) |>
+      summarise(
+        avg_delay = mean(departure_delay, na.rm = TRUE),
+        flight_count = n(),
+        .groups = "drop"
+      )
+    
+    p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = avg_delay)) +
+      geom_tile(color = "white", size = 0.5) +
+      scale_fill_gradient2(low = "#27ae60", mid = "#f39c12", high = "#e74c3c", 
+                           midpoint = 15, name = "Avg Delay\n(min)",
+                           na.value = "#cccccc") +
+      scale_x_continuous(breaks = seq(0, 23, 2)) +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(face = "bold", size = 16, color = "#001f3f"),
         axis.title = element_text(face = "bold", size = 12),
         axis.text = element_text(size = 10),
         legend.position = "right",
-        legend.title = element_text(face = "bold", size = 11),
         plot.background = element_rect(fill = "transparent", color = NA),
-        panel.background = element_rect(fill = "transparent", color = NA),
-        panel.grid = element_line(color = "#f0f0f0")
+        panel.background = element_rect(fill = "transparent", color = NA)
       ) +
       labs(
-        title = "Wind Speed vs Departure Delay (Density Heatmap)",
-        x = "Wind Speed (km/h)",
-        y = "Departure Delay (minutes)"
+        title = "Temporal Risk Heatmap: Danger Zones by Hour & Day",
+        subtitle = "Green = safe booking times, Red = high delay risk",
+        x = "Hour of Day",
+        y = "Day of Week"
       )
     
     ggplotly(p, tooltip = c("x", "y", "fill")) |>
@@ -344,28 +403,31 @@ server <- function(input, output, session) {
   
   output$flight_table <- renderDT({
     data <- filtered_data() |>
+      filter(!is.na(flight_number), flight_number != "", !is.na(airline_name)) |>
       select(
         flight_number,
         airline_name, 
+        departure_estimated,
         departure_iata, 
         arrival_iata, 
-        hour_of_day, 
         departure_delay, 
         wind_speed_10m
       ) |>
       rename(
         "Flight #" = flight_number,
         "Airline" = airline_name,
+        "Departure Time" = departure_estimated,
         "From" = departure_iata,
         "To" = arrival_iata,
-        "Hour" = hour_of_day,
         "Delay (min)" = departure_delay,
         "Wind (km/h)" = wind_speed_10m
       ) |>
       mutate(
+        "Departure Time" = format(`Departure Time`, "%Y-%m-%d %H:%M"),
         "Delay (min)" = round(`Delay (min)`, 1),
         "Wind (km/h)" = round(`Wind (km/h)`, 1)
-      )
+      ) |>
+      arrange(desc(`Departure Time`))
     
     datatable(
       data,
