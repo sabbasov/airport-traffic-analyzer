@@ -4,6 +4,8 @@ library(plotly)
 library(lubridate)
 library(DT)
 library(sys)
+library(shinyjs)
+library(tidymodels)
 
 # Load the trained ML model
 trained_model <- readRDS("model_training.rds")
@@ -30,6 +32,7 @@ flights_data <- flights_data |>
 airlines <- sort(unique(flights_data$airline_name))
 
 ui <- fluidPage(
+  shinyjs::useShinyjs(),
   theme = "https://bootswatch.com/5/flatly/bootstrap.min.css",
   
   tags$head(
@@ -190,6 +193,7 @@ server <- function(input, output, session) {
           hour_of_day = hour(departure_estimated),
           day_of_week = wday(departure_estimated, label = TRUE),
           date = date(departure_estimated),
+          departure_delay_capped = pmin(departure_delay, 300),
           departure_delay = as.numeric(departure_delay),
           departure_delay = case_when(
             departure_delay > 300 ~ NA_real_,
@@ -200,7 +204,13 @@ server <- function(input, output, session) {
       
       removeModal()
       refresh_status(paste("Last updated:", format(Sys.time(), "%H:%M:%S")))
-      session$reload()
+      # Do NOT reload page - reactivity handles updates automatically
+      # Just show success message
+      showModal(modalDialog(
+        title = "Refresh Complete",
+        paste("Data updated successfully. Total flights:", nrow(flights_data)),
+        easyClose = TRUE
+      ))
     }, error = function(e) {
       removeModal()
       showModal(modalDialog(
@@ -254,7 +264,7 @@ server <- function(input, output, session) {
   
   output$delay_distribution <- renderPlotly({
     data <- filtered_data() |>
-      filter(!is.na(departure_delay), departure_delay > -10, departure_delay <= 40)
+      filter(!is.na(departure_delay), departure_delay > -10, departure_delay <= 120)
     
     p <- ggplot(data, aes(x = departure_delay, fill = "Delay")) +
       geom_histogram(binwidth = 2, alpha = 0.7, color = "white") +
@@ -287,8 +297,8 @@ server <- function(input, output, session) {
       ) |>
       filter(flight_count > 0)
     
-    # Find first and last hours with data
-    min_hour <- min(data$hour_of_day)
+    # Find first and last hours with data, but start viewing at Hour 9
+    min_hour <- max(9, min(data$hour_of_day))
     max_hour <- max(data$hour_of_day)
     
     p <- ggplot(data, aes(x = hour_of_day, y = avg_delay)) +
@@ -380,7 +390,11 @@ server <- function(input, output, session) {
       ) |>
       filter(flight_count >= 3)  # Only keep buckets with sufficient data
     
-    p <- ggplot(data, aes(x = wind_bucket, y = avg_delay)) +
+    # Find max wind with data and cap display at 25 km/h or actual max
+    max_wind <- min(25, max(data$wind_bucket, na.rm = TRUE))
+    data_trimmed <- data |> filter(wind_bucket <= max_wind)
+    
+    p <- ggplot(data_trimmed, aes(x = wind_bucket, y = avg_delay)) +
       geom_point(aes(size = flight_count), color = "#0066cc", alpha = 0.6) +
       geom_line(color = "#d73a49", size = 1.2) +
       geom_smooth(method = "loess", color = "#6f42c1", size = 1.2, 
@@ -419,10 +433,11 @@ server <- function(input, output, session) {
     
     p <- ggplot(data, aes(x = hour_of_day, y = day_of_week, fill = avg_delay)) +
       geom_tile(color = "white", size = 0.5) +
-      scale_fill_gradient2(low = "#27ae60", mid = "#f39c12", high = "#e74c3c", 
-                           midpoint = 12, name = "Avg Delay\n(min)",
-                           na.value = "#cccccc",
-                           limits = c(-10, 30)) +
+      scale_fill_gradientn(colors = c("#27ae60", "#f1c40f", "#e67e22", "#c0392b"),
+                           values = c(0, 0.3, 0.6, 1),
+                           limits = c(-10, 30),
+                           name = "Avg Delay\n(min)",
+                           na.value = "#cccccc") +
       scale_x_continuous(breaks = seq(0, 23, 2)) +
       theme_minimal() +
       theme(
@@ -476,11 +491,17 @@ server <- function(input, output, session) {
       # Make predictions
       tryCatch({
         predicted_delays <- predict(trained_model, data_for_pred)
+        # Extract prediction values (result is a tibble with .pred column)
+        if (is.data.frame(predicted_delays)) {
+          predicted_values <- predicted_delays$.pred
+        } else {
+          predicted_values <- as.numeric(predicted_delays)
+        }
         data <- data |>
-          mutate(predicted_delay = as.numeric(predicted_delays))
+          mutate(predicted_delay = as.numeric(predicted_values))
       }, error = function(e) {
         # If prediction fails, log and use NA
-        message("Prediction error: ", conditionMessage(e))
+        warning("Prediction error: ", conditionMessage(e))
         data <<- data |>
           mutate(predicted_delay = NA_real_)
       })
