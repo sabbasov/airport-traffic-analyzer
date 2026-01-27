@@ -1,560 +1,156 @@
 ---
-title: "Airline Performance Dashboard"
-subtitle: "Delay Prediction System"
+title: "Airport Traffic Analyzer"
+subtitle: "A Data-Driven Approach to Understanding and Predicting Flight Delays"
 author: "Sabuhi Abbasov"
 date: today
-format:
+format: 
   revealjs:
-    theme: [default]
-    background-color: "#ffffff"
-    text-color: "#1a1a1a"
-    accent-color: "#0066cc"
+    theme: [simple, dark]
+    slide-number: true
+    toc: false
+    chalkboard: true
     transition: fade
-    transition-speed: fast
-    footer: "<span style='color:#0066cc; font-weight:bold'>SYSTEM_STATUS: ONLINE</span> // airline-traffic-analyzer"
-    slide-number: "c/t"
-    width: 1400
-    height: 800
-    margin: 0.1
-    highlight-style: github
-    code-copy: true
-embed-resources: true
-css: |
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
-  
-  :root {
-    --r-main-font: 'Plus Jakarta Sans', sans-serif;
-    --r-heading-font: 'Plus Jakarta Sans', sans-serif;
-    --r-code-font: 'JetBrains Mono', monospace;
-    --bg-gradient: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-  }
-
-  /* Soft Gradient Background for all slides */
-  .reveal {
-    background: var(--bg-gradient);
-  }
-
-  /* Modern Headers with a pop of color */
-  .reveal h1, .reveal h2, .reveal h3 {
-    color: #001f3f;
-    font-weight: 800;
-    letter-spacing: -1px;
-    text-transform: none;
-  }
-  
-  .reveal h2 {
-    border-left: 8px solid #0066cc;
-    padding-left: 20px;
-    font-size: 2.2em;
-  }
-
-  /* Elegant Code Blocks */
-  .reveal pre {
-    border: none !important;
-    background: #fdfdfd !important;
-    box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1) !important;
-    border-radius: 12px !important;
-    padding: 10px;
-  }
-
-  /* Vibrant Stat Cards */
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5em;
-    margin: 1.5em 0;
-  }
-
-  .stat-card {
-    background: #ffffff;
-    padding: 1.5em;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border-bottom: 5px solid #0066cc; /* Blue */
-    transition: all 0.3s ease;
-  }
-  
-  /* Adding different colors to cards for "vibe" */
-  .stat-card:nth-child(2) { border-bottom-color: #6f42c1; } /* Purple */
-  .stat-card:nth-child(3) { border-bottom-color: #20c997; } /* Teal */
-
-  .stat-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 25px rgba(0, 102, 204, 0.15);
-  }
-
-  .stat-value {
-    font-size: 2.4em;
-    color: #0066cc;
-    font-family: var(--r-code-font);
-    font-weight: 800;
-  }
-
-  .stat-label {
-    font-size: 0.8em;
-    color: #666;
-    text-transform: uppercase;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-
-  /* Key Findings with soft colors */
-  .key-finding {
-    background: rgba(255, 152, 0, 0.1);
-    border-left: 5px solid #ff9800;
-    color: #856404;
-    padding: 1.5em;
-    border-radius: 8px;
-  }
-
-  .insight-box {
-    background: rgba(0, 102, 204, 0.05);
-    border-left: 5px solid #0066cc;
-    color: #004085;
-    padding: 1.5em;
-    border-radius: 8px;
-  }
+    code-line-numbers: false
+    highlight-style: monokai
 ---
 
-```{r setup, include=FALSE}
-library(tidyverse)
-library(plotly)
-library(ggplot2)
+# Introduction
 
-# Load data
-flights_data <- read_csv("data/cleaned/flights_with_weather.csv", show_col_types = FALSE)
-
-# Prepare data
-flights_data <- flights_data %>%
-  mutate(
-    departure_delay = as.numeric(departure_delay),
-    wind_speed_10m = as.numeric(wind_speed_10m),
-    hour_of_day = hour(ymd_hms(departure_estimated)),
-    airline_name = as.factor(airline_name)
-  ) %>%
-  filter(departure_delay > -100, departure_delay < 500)
-```
-
-## Exploratory Analysis: Departure Delays
-
-```{r delay-distribution, echo=FALSE, fig.height=6.5, fig.width=9}
-p <- flights_data %>%
-  ggplot(aes(x = departure_delay, fill = "Delay")) +
-  geom_histogram(bins = 40, color = "white", alpha = 0.8) +
-  scale_fill_manual(values = "#0066cc", name = "Metric") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
-    axis.title = element_text(size = 14, face = "bold", margin = margin(t = 10)),
-    axis.text = element_text(size = 11),
-    panel.grid.major = element_line(color = "#f0f0f0"),
-    legend.position = "right",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 11)
-  ) +
-  labs(
-    title = "Distribution of Departure Delays (897 flights)",
-    x = "Delay (minutes)",
-    y = "Number of Flights"
-  )
-ggplotly(p, tooltip = c("x", "y"))
-```
+- **Project:** Airport Traffic Analyzer
+- **Goal:** Analyze and predict flight departure delays using real-world data
+- **Why it matters:** Delays cost time, money, and disrupt travel plans
 
 ---
 
-## Delay Statistics
+# Data Source & Pipeline
 
-- **Average Delay:** 9.92 minutes
-- **Median Delay:** 2.5 minutes
-- **Maximum Delay:** 616 minutes (10+ hours)
-- **Delay Range:** -90 to +616 minutes
-- **On-Time Performance:** 25% of flights depart on-time
-- **Delayed Flights:** 75% experience some delay
-
-**Insight:** Most delays are small (under 20 min), but outliers significantly impact operations.
+- **API:** Purchased real flight and weather data ($50 investment)
+- **Dataset:** 1,709 flights, 7+ features (airline, airports, time, wind, etc.)
+- **Pipeline:** Automated fetch, clean, merge, and update (Python + R)
+- **Live Data:** Dashboard refreshes with new data at the click of a button
 
 ---
 
-## Weather Observations: Wind Speed
+# Data Preparation & Cleaning
 
-```{r wind-distribution, echo=FALSE, fig.height=6.5, fig.width=9}
-p <- flights_data %>%
-  filter(!is.na(wind_speed_10m)) %>%
-  ggplot(aes(x = wind_speed_10m, fill = "Wind Speed")) +
-  geom_histogram(bins = 30, color = "white", alpha = 0.8) +
-  scale_fill_manual(values = "#6f42c1", name = "Metric") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
-    axis.title = element_text(size = 14, face = "bold", margin = margin(t = 10)),
-    axis.text = element_text(size = 11),
-    panel.grid.major = element_line(color = "#f0f0f0"),
-    legend.position = "right",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 11)
-  ) +
-  labs(
-    title = "Distribution of Wind Speed at Departure Times",
-    x = "Wind Speed (km/h)",
-    y = "Number of Observations"
-  )
-ggplotly(p, tooltip = c("x", "y"))
-```
+- **Data wrangling:** 
+  - Removed incomplete/duplicate records
+  - Engineered features (hour, day of week, wind buckets)
+  - Capped extreme outliers for delay at 120 min
+- **Integrity checks:** Ensured all predictions use the same schema as training
 
 ---
 
-## Wind Speed Statistics
+# Exploratory Data Analysis
 
-- **Minimum Wind Speed:** 0.36 km/h
-- **Mean Wind Speed:** 8.3 km/h
-- **Median Wind Speed:** 8.1 km/h  
-- **Maximum Wind Speed:** 42 km/h
-- **Observations:** 897 complete weather readings
+## Delay Distribution
 
-**Insight:** Typical winds are 5-10 km/h; extreme winds (>30 km/h) are rare events.
+![](delay_distribution.png)
 
----
-
-## Data Manipulation: Merging Sources
-
-**Challenge:** Align 897 flights with hourly weather observations
-
-```r
-# Temporal alignment across data sources
-final_df <- merge_asof(
-  flights %>% arrange(departure_time),
-  weather_data %>% arrange(weather_time),
-  left_on = "departure_time",
-  right_on = "weather_time",
-  by = "departure_airport",
-  direction = "nearest"
-)
-```
-
-**Result:** 97.9% successful match - demonstrates real data manipulation and feature engineering.
+- Most flights are on time (0 min delay)
+- Delays are right-skewed; a few flights experience significant delays
 
 ---
 
-## Temporal Analysis: Delays by Hour of Day
+## Average Delay by Hour
 
-```{r delays-by-hour, echo=FALSE, fig.height=6.5, fig.width=9}
-p <- flights_data %>%
-  group_by(hour_of_day) %>%
-  summarise(mean_delay = mean(departure_delay, na.rm = TRUE),
-            n = n(),
-            .groups = "drop") %>%
-  ggplot(aes(x = hour_of_day, y = mean_delay, fill = mean_delay)) +
-  geom_col(color = "white", size = 0.5) +
-  scale_fill_gradient(low = "#20c997", high = "#d73a49", name = "Avg Delay\n(min)") +
-  scale_x_continuous(breaks = 0:23) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
-    axis.title = element_text(size = 14, face = "bold", margin = margin(t = 10)),
-    axis.text = element_text(size = 11),
-    panel.grid.major = element_line(color = "#f0f0f0"),
-    legend.position = "right",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10)
-  ) +
-  labs(
-    title = "Average Departure Delay by Hour of Day",
-    x = "Hour of Day (24-hour)",
-    y = "Average Delay (minutes)"
-  )
-ggplotly(p, tooltip = c("x", "y"))
-```
+![](avg_delay_by_hour.png)
+
+- **Morning flights:** Minimal delays
+- **Evening flights:** Delays spike after 17:00
+- **Actionable insight:** Book earlier flights for reliability
 
 ---
 
-## Temporal Insights
+## Airline Performance
 
-- **Best Hours:** 6-9 AM have most consistent departures (~5 min delay)
-- **Worst Hours:** 17-19 (5 PM-7 PM) see largest delays (~15 min)
-- **Night Operations:** 22-23 (10-11 PM) relatively efficient despite volume
-- **Early Morning:** 0-5 AM show high variability (small sample)
+![](airline_ranking.png)
 
-**Insight:** Peak evening hours correlate with highest delays - capacity constraints evident.
-
----
-
-## Weather-Delay Relationship
-
-```{r wind-vs-delay, echo=FALSE, fig.height=6.5, fig.width=9}
-wind_delay_full <- flights_data %>%
-  filter(!is.na(wind_speed_10m), !is.na(departure_delay),
-         departure_delay > -100, departure_delay < 500)
-
-p <- wind_delay_full %>%
-  ggplot(aes(x = wind_speed_10m, y = departure_delay)) +
-  geom_hex(bins = 25, fill = "#0066cc", alpha = 0.8) +
-  scale_fill_gradient(low = "#e3f2fd", high = "#d73a49", name = "Frequency") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
-    axis.title = element_text(size = 14, face = "bold", margin = margin(t = 10)),
-    axis.text = element_text(size = 11),
-    panel.grid.major = element_line(color = "#f0f0f0"),
-    legend.position = "right",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10)
-  ) +
-  labs(
-    title = "Wind Speed vs Departure Delay (897 flights - Density Plot)",
-    x = "Wind Speed (km/h)",
-    y = "Departure Delay (minutes)"
-  )
-ggplotly(p, tooltip = c("x", "y", "fill"))
-```
+- **Ranking:** Airlines sorted by average delay
+- **Key finding:** Some carriers (Air Incheon, UPS) have much higher delays
+- **Actionable:** Choose airlines with lower average delays for fewer disruptions
 
 ---
 
-## Weather-Delay Insights
+## Temporal Delay Patterns
 
-- **Low Wind (0-10 km/h):** Delays typically 0-15 minutes
-- **Moderate Wind (10-20 km/h):** Increasing delay variability (0-30+ min)
-- **High Wind (>20 km/h):** Rare but more frequent delays (10-40+ min)
-- **Smoothing Trend:** Non-linear relationship visible
+![](heatmap.png)
 
-**Insight:** Wind speed is one factor; other variables (congestion, maintenance) also matter.
-
----
-
-## Airline Performance Variation
-
-```{r airline-comparison, echo=FALSE, fig.height=6.5, fig.width=9}
-p <- flights_data %>%
-  group_by(airline_name) %>%
-  summarise(mean_delay = mean(departure_delay, na.rm = TRUE),
-            n = n(),
-            .groups = "drop") %>%
-  filter(n >= 5) %>%
-  arrange(desc(mean_delay)) %>%
-  head(12) %>%
-  ggplot(aes(x = reorder(airline_name, mean_delay), y = mean_delay, fill = mean_delay)) +
-  geom_col(color = "white") +
-  scale_fill_gradient(low = "#6f42c1", high = "#d73a49", name = "Avg Delay\n(min)") +
-  coord_flip() +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 18, face = "bold", margin = margin(b = 15)),
-    axis.title = element_text(size = 14, face = "bold", margin = margin(l = 10)),
-    axis.text = element_text(size = 11),
-    panel.grid.major = element_line(color = "#f0f0f0"),
-    legend.position = "right",
-    legend.title = element_text(size = 12, face = "bold"),
-    legend.text = element_text(size = 10)
-  ) +
-  labs(
-    title = "Top 12 Most Delayed Airlines (by average departure delay)",
-    x = "Airline",
-    y = "Average Delay (minutes)"
-  )
-ggplotly(p, tooltip = c("y", "x"))
-```
+- **Heatmap:** Average delay by hour and day of week
+- **Green:** On-time, **Red:** Severe delays
+- **Patterns:** Evenings and certain days are riskier
+- **Note:** Colors represent historical averages, not causality
 
 ---
 
-## Airline Performance Insights
+## Wind Speed vs Delay
 
-- **Best Performers:** Lowest average delay around 5 minutes
-- **Worst Performers:** Average delays 15-20 minutes  
-- **Spread:** 15+ minute difference between best and worst airlines
-- **Correlation:** No single airline dominates across all hours
+![](wind_vs_delay.png)
 
-**Insight:** Operational efficiency varies significantly by carrier - potential for process improvement.
-
----
-
-## Building a Predictive Model
-
-**Can we predict delays using available data?**
-
-Data split:
-- Training: 637 flights (80%)
-- Testing: 160 flights (20%)
-- Features: 20+ engineered variables
-- Validation: 5-fold cross-validation
-
-```r
-# Data preparation
-split <- initial_split(data, prop = 0.80)
-train_data <- training(split)
-test_data <- testing(split)
-
-# Cross-validation
-cv <- vfold_cv(train_data, v = 5)
-```
+- **Hypothesis:** Higher wind = more delays?
+- **Finding:** No strong correlation; delays do not consistently increase with wind
+- **Lesson:** Simple factors are not enough—need multi-feature models
 
 ---
 
-## Random Forest Model
+# Machine Learning Model
 
-Learning from:
-
-- Time features (hour, day of week, etc.)
-- Weather features (wind speed)
-- Airline characteristics
-- Airport patterns
-- Feature interactions
-
-```r
-model <- rand_forest(mtry = tune(), min_n = tune()) %>%
-  set_engine("ranger", importance = "impurity") %>%
-  set_mode("regression")
-```
+- **Model:** Random Forest Regression
+- **Features:** Airline, departure/arrival airport, hour, day, wind speed
+- **Target:** Departure delay (minutes)
+- **Validation:** Trained/tested on historical data
+- **Deployment:** Model predicts delays for new flights in real time
 
 ---
 
-## Model Performance
+# Interactive Dashboard
 
-<div class="stat-grid">
-<div class="stat-card">
-<div class="stat-label">RMSE</div>
-<div class="stat-value">8.4 min</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">MAE</div>
-<div class="stat-value">6.2 min</div>
-</div>
-<div class="stat-card">
-<div class="stat-label">R²</div>
-<div class="stat-value">0.42</div>
-</div>
-</div>
-
-**Interpretation:** Model explains 42% of variance. Predictions typically within ±15 minutes.
-
-Remaining variance from operational factors we don't measure.
+- **Built with:** R Shiny + Plotly
+- **Features:**
+  - **Live Metrics:** Updates with filters and new data
+  - **System Refresh:** Fetches latest flights and weather
+  - **Flight Table:** Search, filter, and see ML-predicted delays
+  - **Visualizations:** All insights available interactively
 
 ---
 
-## Feature Importance
+## Live Demo
 
-Which variables matter most?
-
-| Variable | Importance |
-|----------|-----------|
-| Hour of day | 0.28 |
-| Wind speed | 0.18 |
-| Airline | 0.16 |
-| Day of week | 0.12 |
-| Airports | 0.18 |
-
-**Time of day dominates** as the strongest predictor.
+- **Showcase:** Filtering by airline, hour, and seeing metrics update
+- **System Refresh:** Demonstrate real-time data update
+- **Flight Table:** Show predicted delays for upcoming flights
 
 ---
 
-## Airline Performance Variation
+# Technical Highlights
 
-Airlines differ significantly:
-
-- **Most reliable:** 2-4 min average
-- **Most delayed:** 18-25 min average
-- **Variation:** 15+ minute spread
-
-<div class="insight-box">
-<strong>Insight:</strong> Operational practices create measurable differences between airlines.
-</div>
+- **Data pipeline automation:** Python + R integration
+- **Reactive dashboard:** Shiny’s reactivity for instant feedback
+- **Professional polish:** Clean UI, custom color scales, clear legends
+- **Error handling:** Robust to missing/insufficient data
 
 ---
 
-## Prediction Accuracy by Time
+# Lessons Learned
 
-Where does the model perform best?
-
-| Time Period | Accuracy | Notes |
-|------------|----------|-------|
-| 6-9 AM | Very good | ±1-2 min |
-| 12-3 PM | Moderate | ±15-20 min |
-| 2-6 PM | Poor | ±35-50 min |
-| Evening | Good | ±5-10 min |
-
-**Afternoon hours most unpredictable.** Early morning and evening consistent.
+- **Real data is messy:** Cleaning and validation are critical
+- **Not all features matter:** Wind was a weak predictor
+- **ML adds value:** Combining features yields better predictions
+- **Automation saves time:** System refresh and data sync are essential
 
 ---
 
-## Weather-Delay Relationship
+# Conclusion
 
-Scatter plot shows non-linear pattern:
-
-- Wind 0-10 km/h: minimal correlation
-- Wind 10-20 km/h: weak correlation
-- Wind 20+ km/h: stronger correlation
-- Wind > 30 km/h: highest variance
-
-<div class="key-finding">
-<strong>Finding:</strong> Extreme weather (>20 km/h) has measurable impact; moderate winds minimal effect.
-</div>
+- **Airport Traffic Analyzer** delivers actionable insights from real data
+- **Professional workflow:** From data purchase to live dashboard
+- **Ready for real-world use:** Predicts delays, guides decisions, and updates live
 
 ---
 
-## Model Validation
+# Thank You!
 
-Testing robustness with cross-validation:
-
-```r
-# 5-fold CV results
-cv_metrics <- collect_metrics(cv_results)
-# RMSE folds: 8.1, 8.3, 8.6, 8.2, 8.4
-# Consistent across splits → not overfitted
-```
-
-**Conclusion:** Model is stable and reproducible.
+Questions?  
+[Your contact/email]
 
 ---
-
-## What We Did: Data Analysis Checklist
-
-This project involved real data manipulation and analysis:
-
-- Import data from multiple APIs
-- Clean and handle missing values
-- Merge heterogeneous data sources
-- Engineer features from raw data
-- Explore patterns statistically
-- Build predictive models
-- Validate performance
-- Interpret results
-
----
-
-## Key Discoveries
-
-From the data we learned:
-
-- Delays are **predictable to a degree** (42% explained)
-- **Time matters most** (hour of day strongest predictor)
-- **Airlines differ** (15+ minute variation)
-- **Weather effect is non-linear** (extremes matter)
-- **Patterns are consistent** (reproducible model)
-
----
-
-## Interactive Exploration
-
-Full analysis available via:
-
-- **R Shiny dashboard** – real-time filtering
-- **Quarto report** – 50+ pages of analysis
-- **Raw dataset** – 897 flights, 59 features
-
-All generated from the data pipeline.
-
----
-
-## Summary
-
-This project demonstrates **data manipulation and analysis:**
-
-- Real-world API data integration
-- Multi-source data merging
-- Exploratory statistical analysis
-- Feature engineering
-- Predictive modeling
-- Performance validation
-
-Result: actionable insights into flight delay drivers.
-
-
-
