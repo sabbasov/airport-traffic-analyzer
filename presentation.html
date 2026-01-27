@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="author" content="Sabuhi Abbasov">
-  <meta name="dcterms.date" content="2026-01-26">
+  <meta name="dcterms.date" content="2026-01-27">
   <title>Airport Traffic Analyzer</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -131,7 +131,7 @@
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">Airport Traffic Analyzer</h1>
-  <p class="subtitle">A Data-Driven Approach to Understanding and Predicting Flight Delays</p>
+  <p class="subtitle">Understanding and Predicting Flight Delays</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -141,15 +141,14 @@ Sabuhi Abbasov
 </div>
 </div>
 
-  <p class="date">2026-01-26</p>
+  <p class="date">2026-01-27</p>
 </section>
 <section>
 <section id="introduction" class="title-slide slide level1 center">
 <h1>Introduction</h1>
 <ul>
-<li><strong>Project:</strong> Airport Traffic Analyzer</li>
 <li><strong>Goal:</strong> Analyze and predict flight departure delays using real-world data</li>
-<li><strong>Why it matters:</strong> Delays cost time, money, and disrupt travel plans</li>
+<li><strong>Why:</strong> Delays cost time, money, and disrupt travel plans</li>
 </ul>
 </section>
 <section class="slide level2">
@@ -159,10 +158,10 @@ Sabuhi Abbasov
 <section id="data-source-pipeline" class="title-slide slide level1 center">
 <h1>Data Source &amp; Pipeline</h1>
 <ul>
-<li><strong>API:</strong> Purchased real flight and weather data ($50 investment)</li>
+<li><strong>API:</strong> Purchased real flight and weather data ($50)</li>
 <li><strong>Dataset:</strong> 1,709 flights, 7+ features (airline, airports, time, wind, etc.)</li>
 <li><strong>Pipeline:</strong> Automated fetch, clean, merge, and update (Python + R)</li>
-<li><strong>Live Data:</strong> Dashboard refreshes with new data at the click of a button</li>
+<li><strong>Live Data:</strong> Dashboard refreshes with new data with a button</li>
 </ul>
 </section>
 <section class="slide level2">
@@ -192,7 +191,7 @@ Sabuhi Abbasov
 <section id="delay-distribution" class="slide level2">
 <h2>Delay Distribution</h2>
 
-<img data-src="delay_distribution.png" class="r-stretch"><ul>
+<img data-src="graphs/delay_distribution.png" class="r-stretch"><ul>
 <li>Most flights are on time (0 min delay)</li>
 <li>Delays are right-skewed; a few flights experience significant delays</li>
 </ul>
@@ -200,16 +199,16 @@ Sabuhi Abbasov
 <section id="average-delay-by-hour" class="slide level2">
 <h2>Average Delay by Hour</h2>
 
-<img data-src="avg_delay_by_hour.png" class="r-stretch"><ul>
+<img data-src="graphs/avg_delay_by_hour.png" class="r-stretch"><ul>
 <li><strong>Morning flights:</strong> Minimal delays</li>
 <li><strong>Evening flights:</strong> Delays spike after 17:00</li>
-<li><strong>Actionable insight:</strong> Book earlier flights for reliability</li>
+<li><strong>Insight:</strong> Booking earlier flights might seems smarter</li>
 </ul>
 </section>
 <section id="airline-performance" class="slide level2">
 <h2>Airline Performance</h2>
 
-<img data-src="airline_ranking.png" class="r-stretch"><ul>
+<img data-src="graphs/airline_ranking.png" class="r-stretch"><ul>
 <li><strong>Ranking:</strong> Airlines sorted by average delay</li>
 <li><strong>Key finding:</strong> Some carriers (Air Incheon, UPS) have much higher delays</li>
 <li><strong>Actionable:</strong> Choose airlines with lower average delays for fewer disruptions</li>
@@ -218,7 +217,7 @@ Sabuhi Abbasov
 <section id="temporal-delay-patterns" class="slide level2">
 <h2>Temporal Delay Patterns</h2>
 
-<img data-src="heatmap.png" class="r-stretch"><ul>
+<img data-src="graphs/heatmap.png" class="r-stretch"><ul>
 <li><strong>Heatmap:</strong> Average delay by hour and day of week</li>
 <li><strong>Green:</strong> On-time, <strong>Red:</strong> Severe delays</li>
 <li><strong>Patterns:</strong> Evenings and certain days are riskier</li>
@@ -228,7 +227,7 @@ Sabuhi Abbasov
 <section id="wind-speed-vs-delay" class="slide level2">
 <h2>Wind Speed vs Delay</h2>
 
-<img data-src="wind_vs_delay.png" class="r-stretch"><ul>
+<img data-src="graphs/wind_vs_delay.png" class="r-stretch"><ul>
 <li><strong>Hypothesis:</strong> Higher wind = more delays?</li>
 <li><strong>Finding:</strong> No strong correlation; delays do not consistently increase with wind</li>
 <li><strong>Lesson:</strong> Simple factors are not enough—need multi-feature models</li>
@@ -317,8 +316,7 @@ Sabuhi Abbasov
 <section>
 <section id="thank-you" class="title-slide slide level1 center">
 <h1>Thank You!</h1>
-<p>Questions?<br>
-[Your contact/email]</p>
+<p>Questions?</p>
 </section>
 <section class="slide level2">
 

@@ -1,6 +1,6 @@
 ---
 title: "Airport Traffic Analyzer"
-subtitle: "A Data-Driven Approach to Understanding and Predicting Flight Delays"
+subtitle: "Understanding and Predicting Flight Delays"
 author: "Sabuhi Abbasov"
 date: today
 format: 
@@ -16,18 +16,17 @@ format:
 
 # Introduction
 
-- **Project:** Airport Traffic Analyzer
 - **Goal:** Analyze and predict flight departure delays using real-world data
-- **Why it matters:** Delays cost time, money, and disrupt travel plans
+- **Why:** Delays cost time, money, and disrupt travel plans
 
 ---
 
 # Data Source & Pipeline
 
-- **API:** Purchased real flight and weather data ($50 investment)
+- **API:** Purchased real flight and weather data ($50)
 - **Dataset:** 1,709 flights, 7+ features (airline, airports, time, wind, etc.)
 - **Pipeline:** Automated fetch, clean, merge, and update (Python + R)
-- **Live Data:** Dashboard refreshes with new data at the click of a button
+- **Live Data:** Dashboard refreshes with new data with a button
 
 ---
 
@@ -45,7 +44,7 @@ format:
 
 ## Delay Distribution
 
-![](delay_distribution.png)
+![](graphs/delay_distribution.png)
 
 - Most flights are on time (0 min delay)
 - Delays are right-skewed; a few flights experience significant delays
@@ -54,17 +53,17 @@ format:
 
 ## Average Delay by Hour
 
-![](avg_delay_by_hour.png)
+![](graphs/avg_delay_by_hour.png)
 
 - **Morning flights:** Minimal delays
 - **Evening flights:** Delays spike after 17:00
-- **Actionable insight:** Book earlier flights for reliability
+- **Insight:** Booking earlier flights might seems smarter
 
 ---
 
 ## Airline Performance
 
-![](airline_ranking.png)
+![](graphs/airline_ranking.png)
 
 - **Ranking:** Airlines sorted by average delay
 - **Key finding:** Some carriers (Air Incheon, UPS) have much higher delays
@@ -74,7 +73,7 @@ format:
 
 ## Temporal Delay Patterns
 
-![](heatmap.png)
+![](graphs/heatmap.png)
 
 - **Heatmap:** Average delay by hour and day of week
 - **Green:** On-time, **Red:** Severe delays
@@ -85,7 +84,7 @@ format:
 
 ## Wind Speed vs Delay
 
-![](wind_vs_delay.png)
+![](graphs/wind_vs_delay.png)
 
 - **Hypothesis:** Higher wind = more delays?
 - **Finding:** No strong correlation; delays do not consistently increase with wind
@@ -150,7 +149,6 @@ format:
 
 # Thank You!
 
-Questions?  
-[Your contact/email]
+Questions?
 
 ---
