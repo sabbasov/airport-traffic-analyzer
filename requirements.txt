@@ -1,0 +1,2 @@
+# Empty file - this app is primarily R/Shiny
+# Python scripts use: pandas, requests, scikit-learn, openmeteo-requests, python-dotenv
