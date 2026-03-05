@@ -1,104 +1,91 @@
-# Airline Performance Dashboard & Delay Prediction System
+# Airport Traffic Analyzer
 
-Real-time flight delay monitoring and prediction using Python, R, and machine learning.
+A real-time flight delay monitoring and prediction system built with Python, R, and machine learning.
 
-## Setup (Important: Add Your API Key First!)
+- Interactive Shiny dashboard deployed on [ShinyApps.io](https://sabbasov.shinyapps.io/airport-traffic-analyzer/)
+- Random Forest ML model predicts departure delays with 8.4 min RMSE
+- Data accumulation strategy: grows with each run, avoiding redundant API calls
+- 50+ visualizations in analytics report (Quarto)
 
-**1. Copy the example environment file:**
-```bash
-cp .env.example .env
-```
+## Tech Stack
+- **Backend:** Python (data pipeline, ML training)
+- **Frontend:** R Shiny (interactive dashboard)
+- **ML Framework:** tidymodels, scikit-learn
+- **Data Processing:** tidyverse, pandas
+- **Visualization:** Plotly, ggplot2
+- **Data:** Aviation Stack API + Open-Meteo Weather API
+- **Deployment:** ShinyApps.io (Shiny app), GitHub (code)
 
-**2. Add your Aviation Stack API key to `.env`:**
-```bash
-# Edit .env and replace with your actual key
-AVIATIONSTACK_API_KEY=your_api_key_here
-```
+## Project Structure
+- `/scripts`: Python data fetching and processing pipeline
+- `/data/cleaned`: Processed flight and weather data (CSV format)
+- `/shiny_app.R`: Interactive Shiny dashboard with 5 tabs
+- `/model_training.R`: Random Forest model training
+- `/analysis.qmd`: Analytics report with 50+ visualizations
+- `/presentation.qmd`: Data analysis presentation (Reveal.js)
+- `/setup.sh`: Automation script for setup and workflows
 
-Get a free API key at [aviationstack.com](https://aviationstack.com)
-
-**3. Install and run:**
-```bash
-chmod +x setup.sh
-./setup.sh full        # Complete setup (dependencies + data + model + report)
-./setup.sh dashboard   # Launch dashboard
-```
-
-## Key Features
-
-🔄 **Incremental Data Accumulation** - Data grows with each run, avoiding redundant API calls  
-📊 **Interactive Dashboard** - Real-time filtering, predictions, and visualizations  
-🤖 **ML Model** - Random Forest regressor predicts delays (RMSE: 8.4 min)  
-📈 **Analytics Report** - 50+ visualizations of patterns and insights  
-⚡ **Automated Pipeline** - One command sets up everything  
-🔐 **Secure** - API key stored locally in .env (not in git)
-
-## Usage
-
-### Automated Setup
-```bash
-./setup.sh setup       # Install Python + R packages
-./setup.sh data        # Fetch flights + weather data (accumulates)
-./setup.sh model       # Train ML model on all data
-./setup.sh dashboard   # Launch interactive dashboard
-./setup.sh report      # Generate analytics report
-./setup.sh full        # All of the above
-```
-
-### Manual Workflow
-```bash
-# Fetch and process data
-python scripts/fetch_data.py
-
-# Train the model
-Rscript -e "source('model_training.R')"
-
-# Launch dashboard (interactive)
-Rscript -e "shiny::runApp('shiny_app.R')"
-
-# Generate report
-quarto render analysis.qmd --to html
-```
+## Features
+- **Airline Comparison:** Ranked by average delay performance
+- **Wind Sensitivity Analysis:** Correlation between wind speed and delays
+- **Temporal Risk Heatmap:** Hour × day-of-week delay patterns
+- **Delay Patterns:** Distribution and hourly trends
+- **Flight Details:** Real-time predictions with filters
+- **Live Metrics:** Total flights, avg delay, wind speed, on-time percentage
 
 ## Data Accumulation Strategy
 
-The system **builds a growing database** instead of replacing data each time:
+The system builds a growing database instead of replacing data:
 
-- **First run**: Fetches 7 days of historical flights → 897 flights
-- **Second run**: Only fetches 1 new day → 932 flights total
-- **Subsequent runs**: Adds ~35 new flights daily with 1 API call
+- **First run:** Fetches 7 days of historical flights
+- **Subsequent runs:** Only fetches 1 new day (~35 flights)
+- **Benefits:** Growing training data, 99% fewer API calls after first run, automatic duplicate removal
 
-**Benefits**:
-- ✅ Growing training data = Better ML models
-- ✅ 99% fewer API calls after first run
-- ✅ Duplicates automatically removed
-- ✅ Dashboard shows increasingly rich insights
+## Local Development
 
-See [DATA_ACCUMULATION_GUIDE.md](DATA_ACCUMULATION_GUIDE.md) for details.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/sabbasov/airport-traffic-analyzer.git
+   cd airport-traffic-analyzer
+   ```
 
-## Files
+2. Set up environment (requires R and Python):
+   ```bash
+   cp .env.example .env
+   # Add your Aviation Stack API key to .env
+   chmod +x setup.sh
+   ./setup.sh setup
+   ```
 
-| File | Purpose |
-|------|---------|
-| `scripts/fetch_data.py` | Data pipeline (Aviation Stack + Open-Meteo APIs) |
-| `shiny_app.R` | Interactive Shiny dashboard with 5 tabs |
-| `model_training.R` | Random Forest model (RMSE: 8.4 min) |
-| `analysis.qmd` | Analytics report (50+ visualizations) |
-| `presentation.qmd` | Data analysis presentation (Reveal.js) |
-| `setup.sh` | Automation script |
-| `pyproject.toml` | Python package config |
+3. Run the interactive dashboard:
+   ```bash
+   ./setup.sh dashboard
+   ```
+
+4. Generate reports:
+   ```bash
+   ./setup.sh report
+   ```
 
 ## Current Data Status
 
-- **Flights**: 897 records (100 live + 797 historical)
-- **Features**: 59 per flight (time, weather, airline, airports)
-- **Date range**: Last 7 days + today
-- **Weather match**: 97.9% success rate
+- **Flights:** 897 records (historical + recent)
+- **Features:** 59 engineered per flight
+- **Date Range:** Last 7 days + today
+- **Weather Match:** 97.9% success rate
 
 ## Model Performance
 
-- **RMSE**: 8.4 minutes (test set)
-- **MAE**: 6.2 minutes
-- **R²**: 0.42 (explains 42% of variance)
-- **Features**: 20+ engineered variables
-- **Validation**: 5-fold cross-validation
+- **RMSE:** 8.4 minutes (test set)
+- **MAE:** 6.2 minutes
+- **R²:** 0.42 (explains 42% of variance)
+- **Validation:** 5-fold cross-validation
+
+## Live Dashboard
+
+Visit the deployed app: [https://sabbasov.shinyapps.io/airport-traffic-analyzer/](https://sabbasov.shinyapps.io/airport-traffic-analyzer/)
+
+The dashboard updates with saved data and doesn't require API credentials to view.
+
+## License
+MIT License - see the LICENSE file for details.
