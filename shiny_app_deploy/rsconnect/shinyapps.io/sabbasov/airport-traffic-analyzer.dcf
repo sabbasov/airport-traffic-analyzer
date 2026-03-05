@@ -5,6 +5,6 @@ account: sabbasov
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16820504
-bundleId: 11664887
+bundleId: 11664928
 url: https://sabbasov.shinyapps.io/airport-traffic-analyzer/
 version: 1
