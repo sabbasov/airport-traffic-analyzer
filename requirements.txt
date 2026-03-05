@@ -1,2 +1,6 @@
-# Empty file - this app is primarily R/Shiny
-# Python scripts use: pandas, requests, scikit-learn, openmeteo-requests, python-dotenv
+Flask==3.0.0
+pandas
+requests
+scikit-learn
+openmeteo-requests
+python-dotenv
